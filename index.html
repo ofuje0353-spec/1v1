@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ofuje - Multiplayer CBT</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg: #f0f2f5; --card: #fff; --text: #1a1a2e; --text2: #666;
+            --primary: #6c5ce7; --primary-dark: #5b4cdb; --success: #00b894;
+            --danger: #e74c3c; --border: #e0e0e0; --shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+        .dark {
+            --bg: #0f0f1a; --card: #1a1a2e; --text: #fff; --text2: #a0a0a0;
+            --border: #2d2d44; --shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; transition: all 0.3s; }
+        .hidden { display: none !important; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .card { background: var(--card); border-radius: 16px; padding: 30px; box-shadow: var(--shadow); margin-bottom: 20px; }
+        .btn { padding: 12px 24px; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; transition: all 0.3s; font-size: 14px; }
+        .btn-primary { background: var(--primary); color: #fff; }
+        .btn-primary:hover { background: var(--primary-dark); transform: translateY(-2px); }
+        .btn-danger { background: var(--danger); color: #fff; }
+        .btn-success { background: var(--success); color: #fff; }
+        .btn-outline { background: transparent; border: 2px solid var(--primary); color: var(--primary); }
+        input, select { width: 100%; padding: 14px 18px; border: 2px solid var(--border); border-radius: 10px; font-size: 15px; background: var(--card); color: var(--text); margin-bottom: 15px; transition: all 0.3s; }
+        input:focus, select:focus { outline: none; border-color: var(--primary); }
+        .flex { display: flex; align-items: center; gap: 15px; }
+        .flex-between { display: flex; justify-content: space-between; align-items: center; }
+        .grid { display: grid; gap: 20px; }
+        .grid-2 { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+        
+        /* Auth */
+        #auth { display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+        .auth-card { max-width: 420px; width: 100%; text-align: center; }
+        .auth-card h1 { font-size: 42px; margin-bottom: 10px; background: linear-gradient(135deg, var(--primary), #a29bfe); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .auth-card p { color: var(--text2); margin-bottom: 30px; }
+        .tabs { display: flex; margin-bottom: 25px; background: var(--bg); border-radius: 10px; padding: 5px; }
+        .tab { flex: 1; padding: 12px; border: none; background: none; cursor: pointer; border-radius: 8px; font-weight: 500; color: var(--text2); transition: all 0.3s; }
+        .tab.active { background: var(--primary); color: #fff; }
+        
+        /* Dashboard */
+        .header { background: var(--card); padding: 15px 30px; box-shadow: var(--shadow); margin-bottom: 30px; border-radius: 0 0 20px 20px; position: sticky; top: 0; z-index: 100; }
+        .logo { font-size: 28px; font-weight: 700; background: linear-gradient(135deg, var(--primary), #a29bfe); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .user-info { display: flex; align-items: center; gap: 12px; }
+        .avatar { width: 45px; height: 45px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), #a29bfe); display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 600; font-size: 18px; }
+        .user-name { font-weight: 600; }
+        .user-points { color: var(--text2); font-size: 13px; }
+        .toggle-dark { background: none; border: none; font-size: 22px; cursor: pointer; color: var(--text); }
+        
+        /* Nav */
+        .nav { display: flex; gap: 10px; margin-bottom: 30px; flex-wrap: wrap; }
+        .nav-btn { padding: 12px 20px; background: var(--card); border: none; border-radius: 10px; cursor: pointer; font-weight: 500; color: var(--text2); transition: all 0.3s; display: flex; align-items: center; gap: 8px; }
+        .nav-btn.active, .nav-btn:hover { background: var(--primary); color: #fff; }
+        
+        /* Tests */
+        .test-card { background: linear-gradient(135deg, var(--primary), #a29bfe); color: #fff; border-radius: 16px; padding: 25px; cursor: pointer; transition: all 0.3s; }
+        .test-card:hover { transform: translateY(-5px); box-shadow: 0 10px 30px rgba(108,92,231,0.3); }
+        .test-card h3 { margin-bottom: 10px; font-size: 20px; }
+        .test-card p { opacity: 0.9; font-size: 14px; }
+        
+        /* Leaderboard */
+        .leader-item { display: flex; align-items: center; gap: 15px; padding: 15px; border-radius: 12px; transition: all 0.3s; }
+        .leader-item:hover { background: var(--bg); }
+        .rank { width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; }
+        .rank-1 { background: linear-gradient(135deg, #f1c40f, #f39c12); color: #fff; }
+        .rank-2 { background: linear-gradient(135deg, #bdc3c7, #95a5a6); color: #fff; }
+        .rank-3 { background: linear-gradient(135deg, #e67e22, #d35400); color: #fff; }
+        .rank-default { background: var(--bg); color: var(--text2); }
+        .leader-points { margin-left: auto; font-weight: 600; color: var(--primary); }
+        
+        /* Quiz */
+        #quiz { min-height: 100vh; padding: 20px; }
+        .quiz-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; margin-bottom: 30px; }
+        .timer { font-size: 28px; font-weight: 700; color: var(--primary); }
+        .timer.warning { color: var(--danger); animation: pulse 1s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        .players { display: flex; gap: 20px; flex-wrap: wrap; }
+        .player-card { background: var(--card); padding: 15px 25px; border-radius: 12px; min-width: 200px; }
+        .player-card.me { border: 2px solid var(--primary); }
+        .player-status { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text2); margin-top: 5px; }
+        .question-box { background: var(--card); border-radius: 16px; padding: 30px; margin-bottom: 20px; }
+        .question-num { color: var(--primary); font-weight: 600; margin-bottom: 15px; }
+        .question-text { font-size: 20px; font-weight: 500; margin-bottom: 25px; line-height: 1.6; }
+        .options { display: grid; gap: 12px; }
+        .option { padding: 18px 20px; border: 2px solid var(--border); border-radius: 12px; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; gap: 12px; }
+        .option:hover { border-color: var(--primary); background: rgba(108,92,231,0.05); }
+        .option.selected { border-color: var(--primary); background: rgba(108,92,231,0.1); }
+        .option-letter { width: 35px; height: 35px; border-radius: 50%; background: var(--bg); display: flex; align-items: center; justify-content: center; font-weight: 600; }
+        .option.selected .option-letter { background: var(--primary); color: #fff; }
+        .quiz-nav { display: flex; justify-content: space-between; gap: 15px; flex-wrap: wrap; }
+        
+        /* Voice */
+        .voice-controls { display: flex; gap: 10px; }
+        .voice-btn { width: 45px; height: 45px; border-radius: 50%; border: none; cursor: pointer; font-size: 18px; transition: all 0.3s; }
+        .voice-btn.active { background: var(--success); color: #fff; }
+        .voice-btn.muted { background: var(--danger); color: #fff; }
+        
+        /* Waiting */
+        .waiting { text-align: center; padding: 60px 20px; }
+        .waiting-spinner { width: 80px; height: 80px; border: 4px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 30px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        /* Results */
+        .results { text-align: center; }
+        .result-score { font-size: 72px; font-weight: 700; background: linear-gradient(135deg, var(--primary), #a29bfe); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .result-change { font-size: 24px; margin: 10px 0; }
+        .result-change.positive { color: var(--success); }
+        .result-change.negative { color: var(--danger); }
+        
+        /* Modal */
+        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; z-index: 1000; padding: 20px; }
+        .modal-content { background: var(--card); border-radius: 16px; padding: 30px; max-width: 400px; width: 100%; text-align: center; }
+        
+        /* Records */
+        .record-item { display: flex; justify-content: space-between; align-items: center; padding: 15px; border-bottom: 1px solid var(--border); }
+        .record-item:last-child { border: none; }
+        .record-result { padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+        .record-result.win { background: rgba(0,184,148,0.1); color: var(--success); }
+        .record-result.loss { background: rgba(231,76,60,0.1); color: var(--danger); }
+        
+        @media (max-width: 768px) {
+            .header { padding: 15px; }
+            .auth-card h1 { font-size: 32px; }
+            .quiz-header { flex-direction: column; align-items: stretch; }
+            .timer { text-align: center; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Auth -->
+    <div id="auth">
+        <div class="card auth-card">
+            <h1>Ofuje</h1>
+            <p>Multiplayer CBT Platform</p>
+            <div class="tabs">
+                <button class="tab active" onclick="showTab('login')">Login</button>
+                <button class="tab" onclick="showTab('register')">Register</button>
+            </div>
+            <div id="login-form">
+                <input type="text" id="login-code" placeholder="Enter Access Code">
+                <button class="btn btn-primary" style="width:100%" onclick="login()">Login</button>
+            </div>
+            <div id="register-form" class="hidden">
+                <input type="text" id="reg-name" placeholder="Your Name">
+                <input type="text" id="reg-code" placeholder="Create Access Code">
+                <button class="btn btn-primary" style="width:100%" onclick="register()">Register</button>
+            </div>
+            <p id="auth-error" style="color:var(--danger);margin-top:15px"></p>
+        </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div id="dashboard" class="hidden">
+        <header class="header">
+            <div class="flex-between">
+                <span class="logo">Ofuje</span>
+                <div class="flex">
+                    <button class="toggle-dark" onclick="toggleDark()"><i class="fas fa-moon"></i></button>
+                    <div class="user-info">
+                        <div class="avatar" id="user-avatar"></div>
+                        <div>
+                            <div class="user-name" id="user-name"></div>
+                            <div class="user-points"><i class="fas fa-star"></i> <span id="user-points">0</span> pts</div>
+                        </div>
+                    </div>
+                    <button class="btn btn-outline" onclick="logout()">Logout</button>
+                </div>
+            </div>
+        </header>
+        <div class="container">
+            <div class="nav">
+                <button class="nav-btn active" onclick="showSection('tests')"><i class="fas fa-play"></i> Tests</button>
+                <button class="nav-btn" onclick="showSection('records')"><i class="fas fa-history"></i> My Records</button>
+                <button class="nav-btn" onclick="showSection('leaderboard')"><i class="fas fa-trophy"></i> Leaderboard</button>
+                <button class="nav-btn" onclick="showSection('users')"><i class="fas fa-users"></i> Users</button>
+            </div>
+            
+            <div id="tests-section">
+                <h2 style="margin-bottom:20px">Available Tests</h2>
+                <div class="grid grid-2" id="tests-list"></div>
+            </div>
+            
+            <div id="records-section" class="hidden">
+                <div class="card">
+                    <h2 style="margin-bottom:20px">My Past Records</h2>
+                    <div id="records-list"></div>
+                </div>
+            </div>
+            
+            <div id="leaderboard-section" class="hidden">
+                <div class="card">
+                    <h2 style="margin-bottom:20px"><i class="fas fa-trophy" style="color:#f1c40f"></i> Leaderboard</h2>
+                    <div id="leaderboard-list"></div>
+                </div>
+            </div>
+            
+            <div id="users-section" class="hidden">
+                <div class="card">
+                    <h2 style="margin-bottom:20px">All Users</h2>
+                    <div id="users-list"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Code Modal -->
+    <div id="code-modal" class="modal hidden">
+        <div class="modal-content">
+            <h2 style="margin-bottom:20px">Enter Test Code</h2>
+            <input type="text" id="test-code-input" placeholder="Enter code to proceed">
+            <p id="code-error" style="color:var(--danger);margin-bottom:15px"></p>
+            <div class="flex" style="justify-content:center">
+                <button class="btn btn-outline" onclick="closeCodeModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="verifyCode()">Proceed</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Waiting Room -->
+    <div id="waiting" class="hidden">
+        <div class="container">
+            <div class="card waiting">
+                <div class="waiting-spinner"></div>
+                <h2>Waiting for opponent...</h2>
+                <p style="color:var(--text2);margin:15px 0">Test: <span id="waiting-test"></span></p>
+                <button class="btn btn-danger" onclick="cancelWaiting()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quiz -->
+    <div id="quiz" class="hidden">
+        <div class="container">
+            <div class="quiz-header">
+                <div class="timer" id="timer">60:00</div>
+                <div class="voice-controls">
+                    <button class="voice-btn active" id="mic-btn" onclick="toggleMic()"><i class="fas fa-microphone"></i></button>
+                    <button class="voice-btn active" id="speaker-btn" onclick="toggleSpeaker()"><i class="fas fa-volume-up"></i></button>
+                </div>
+            </div>
+            <div class="players">
+                <div class="player-card me">
+                    <div class="flex">
+                        <div class="avatar" id="my-avatar"></div>
+                        <div>
+                            <div class="user-name" id="my-name">You</div>
+                            <div class="player-status">Q: <span id="my-question">1</span>/10 | Score: <span id="my-score">0</span></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="player-card">
+                    <div class="flex">
+                        <div class="avatar" id="opp-avatar"></div>
+                        <div>
+                            <div class="user-name" id="opp-name">Opponent</div>
+                            <div class="player-status">Q: <span id="opp-question">1</span>/10 | Score: <span id="opp-score">0</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="question-box">
+                <div class="question-num">Question <span id="q-num">1</span> of 10</div>
+                <div class="question-text" id="q-text"></div>
+                <div class="options" id="options"></div>
+            </div>
+            <div class="quiz-nav">
+                <button class="btn btn-outline" id="prev-btn" onclick="prevQuestion()">Previous</button>
+                <button class="btn btn-primary" id="next-btn" onclick="nextQuestion()">Next</button>
+                <button class="btn btn-success hidden" id="submit-btn" onclick="submitQuiz()">Submit</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Results -->
+    <div id="results" class="hidden">
+        <div class="container">
+            <div class="card results">
+                <h1 style="margin-bottom:30px">Quiz Complete!</h1>
+                <div class="grid grid-2">
+                    <div class="card" style="background:var(--bg)">
+                        <h3 id="result-my-name">You</h3>
+                        <div class="result-score" id="result-my-score">0</div>
+                        <div class="result-change" id="result-my-change">+0</div>
+                        <p style="color:var(--text2)">Total: <span id="result-my-total">0</span> pts</p>
+                    </div>
+                    <div class="card" style="background:var(--bg)">
+                        <h3 id="result-opp-name">Opponent</h3>
+                        <div class="result-score" id="result-opp-score">0</div>
+                        <div class="result-change" id="result-opp-change">+0</div>
+                        <p style="color:var(--text2)">Total: <span id="result-opp-total">0</span> pts</p>
+                    </div>
+                </div>
+                <button class="btn btn-primary" style="margin-top:30px" onclick="backToDashboard()">Back to Dashboard</button>
+            </div>
+        </div>
+    </div>
+
+    <audio id="remote-audio" autoplay></audio>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <script>
+        // Firebase Config - Replace with your own
+        const firebaseConfig = {
+apiKey: "AIzaSyBfZ8qfRLt1qxeUjeXgNlAaA5UM2HD6EVk",
+  authDomain: "olodo-4ef0a.firebaseapp.com",
+  projectId: "olodo-4ef0a",
+  storageBucket: "olodo-4ef0a.firebasestorage.app",
+  messagingSenderId: "27624863656",
+  appId: "1:27624863656:web:3e96637b736f144d770f9d",
+  measurementId: "G-S90QFQ7SCC"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        // State
+        let currentUser = null, currentTest = null, currentSession = null;
+        let answers = [], timer = null, timeLeft = 3600;
+        let localStream = null, peerConnection = null;
+        let micOn = true, speakerOn = true;
+
+        // Tests Data
+        const tests = {
+            test1: {
+                name: "General Knowledge",
+                description: "Test your general knowledge",
+                questions: [
+                    {q: "What is the capital of France?", o: ["London", "Paris", "Berlin", "Madrid"], a: 1},
+                    {q: "Which planet is known as the Red Planet?", o: ["Venus", "Jupiter", "Mars", "Saturn"], a: 2},
+                    {q: "What is the largest ocean on Earth?", o: ["Atlantic", "Indian", "Arctic", "Pacific"], a: 3},
+                    {q: "Who painted the Mona Lisa?", o: ["Van Gogh", "Da Vinci", "Picasso", "Rembrandt"], a: 1},
+                    {q: "What is the chemical symbol for gold?", o: ["Go", "Gd", "Au", "Ag"], a: 2},
+                    {q: "How many continents are there?", o: ["5", "6", "7", "8"], a: 2},
+                    {q: "What is the largest mammal?", o: ["Elephant", "Blue Whale", "Giraffe", "Hippo"], a: 1},
+                    {q: "Which year did World War II end?", o: ["1943", "1944", "1945", "1946"], a: 2},
+                    {q: "What is the hardest natural substance?", o: ["Gold", "Iron", "Diamond", "Platinum"], a: 2},
+                    {q: "How many bones are in the human body?", o: ["186", "206", "226", "246"], a: 1}
+                ]
+            },
+            test2: {
+                name: "Science & Technology",
+                description: "Test your science knowledge",
+                questions: [
+                    {q: "What does CPU stand for?", o: ["Central Process Unit", "Central Processing Unit", "Computer Personal Unit", "Central Program Unit"], a: 1},
+                    {q: "What is the speed of light?", o: ["300,000 km/s", "150,000 km/s", "450,000 km/s", "600,000 km/s"], a: 0},
+                    {q: "What is H2O commonly known as?", o: ["Oxygen", "Hydrogen", "Water", "Helium"], a: 2},
+                    {q: "Who invented the telephone?", o: ["Edison", "Tesla", "Bell", "Newton"], a: 2},
+                    {q: "What is the closest planet to the Sun?", o: ["Venus", "Mercury", "Earth", "Mars"], a: 1},
+                    {q: "What does DNA stand for?", o: ["Deoxyribonucleic Acid", "Deoxyribose Nucleic Acid", "Dinucleotide Acid", "None"], a: 0},
+                    {q: "What is the atomic number of Carbon?", o: ["4", "6", "8", "12"], a: 1},
+                    {q: "Who developed the theory of relativity?", o: ["Newton", "Einstein", "Hawking", "Curie"], a: 1},
+                    {q: "What is the powerhouse of the cell?", o: ["Nucleus", "Ribosome", "Mitochondria", "Golgi"], a: 2},
+                    {q: "What year was the first iPhone released?", o: ["2005", "2006", "2007", "2008"], a: 2}
+                ]
+            }
+        };
+
+        // Auth Functions
+        function showTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById('login-form').classList.toggle('hidden', tab !== 'login');
+            document.getElementById('register-form').classList.toggle('hidden', tab !== 'register');
+        }
+
+        async function register() {
+            const name = document.getElementById('reg-name').value.trim();
+            const code = document.getElementById('reg-code').value.trim();
+            if (!name || !code) return showError('Fill all fields');
+            const snapshot = await db.ref('users/' + code).once('value');
+            if (snapshot.exists()) return showError('Code already exists');
+            await db.ref('users/' + code).set({name, points: 0, records: []});
+            showError('Registered! Please login');
+        }
+
+        async function login() {
+            const code = document.getElementById('login-code').value.trim();
+            if (!code) return showError('Enter access code');
+            const snapshot = await db.ref('users/' + code).once('value');
+            if (!snapshot.exists()) return showError('Invalid access code');
+            currentUser = {code, ...snapshot.val()};
+            showDashboard();
+        }
+
+        function logout() {
+            currentUser = null;
+            document.getElementById('auth').classList.remove('hidden');
+            document.getElementById('dashboard').classList.add('hidden');
+        }
+
+        function showError(msg) { document.getElementById('auth-error').textContent = msg; }
+
+        // Dashboard
+        function showDashboard() {
+            document.getElementById('auth').classList.add('hidden');
+            document.getElementById('dashboard').classList.remove('hidden');
+            document.getElementById('user-avatar').textContent = currentUser.name[0].toUpperCase();
+            document.getElementById('user-name').textContent = currentUser.name;
+            document.getElementById('user-points').textContent = currentUser.points || 0;
+            renderTests();
+            loadLeaderboard();
+            loadRecords();
+            loadUsers();
+            db.ref('users/' + currentUser.code).on('value', snap => {
+                if (snap.exists()) {
+                    currentUser = {code: currentUser.code, ...snap.val()};
+                    document.getElementById('user-points').textContent = currentUser.points || 0;
+                }
+            });
+        }
+
+        function showSection(section) {
+            ['tests', 'records', 'leaderboard', 'users'].forEach(s => {
+                document.getElementById(s + '-section').classList.toggle('hidden', s !== section);
+            });
+            document.querySelectorAll('.nav-btn').forEach((b, i) => {
+                b.classList.toggle('active', ['tests', 'records', 'leaderboard', 'users'][i] === section);
+            });
+        }
+
+        function renderTests() {
+            const html = Object.entries(tests).map(([id, t]) => `
+                <div class="test-card" onclick="selectTest('${id}')">
+                    <h3><i class="fas fa-file-alt"></i> ${t.name}</h3>
+                    <p>${t.description}</p>
+                    <p style="margin-top:15px"><i class="fas fa-clock"></i> 1 hour | 10 questions</p>
+                </div>
+            `).join('');
+            document.getElementById('tests-list').innerHTML = html;
+        }
+
+        async function loadLeaderboard() {
+            const snapshot = await db.ref('users').orderByChild('points').once('value');
+            const users = [];
+            snapshot.forEach(child => users.push({code: child.key, ...child.val()}));
+            users.sort((a, b) => (b.points || 0) - (a.points || 0));
+            document.getElementById('leaderboard-list').innerHTML = users.map((u, i) => `
+                <div class="leader-item">
+                    <div class="rank ${i < 3 ? 'rank-' + (i+1) : 'rank-default'}">${i + 1}</div>
+                    <div class="avatar">${u.name[0].toUpperCase()}</div>
+                    <span>${u.name}</span>
+                    <span class="leader-points">${u.points || 0} pts</span>
+                </div>
+            `).join('') || '<p style="color:var(--text2)">No users yet</p>';
+        }
+
+        async function loadRecords() {
+            const records = currentUser.records || [];
+            document.getElementById('records-list').innerHTML = records.length ? records.slice(-10).reverse().map(r => `
+                <div class="record-item">
+                    <div>
+                        <strong>${r.test}</strong>
+                        <div style="color:var(--text2);font-size:13px">vs ${r.opponent} | ${new Date(r.date).toLocaleDateString()}</div>
+                    </div>
+                    <div style="text-align:right">
+                        <span class="record-result ${r.result}">${r.result.toUpperCase()}</span>
+                        <div style="margin-top:5px">${r.score}/10</div>
+                    </div>
+                </div>
+            `).join('') : '<p style="color:var(--text2)">No records yet</p>';
+        }
+
+        async function loadUsers() {
+            const snapshot = await db.ref('users').once('value');
+            const users = [];
+            snapshot.forEach(child => users.push({code: child.key, ...child.val()}));
+            document.getElementById('users-list').innerHTML = users.map(u => `
+                <div class="leader-item">
+                    <div class="avatar">${u.name[0].toUpperCase()}</div>
+                    <div>
+                        <div>${u.name}</div>
+                        <div style="color:var(--text2);font-size:13px">${(u.records || []).length} matches</div>
+                    </div>
+                    <span class="leader-points">${u.points || 0} pts</span>
+                </div>
+            `).join('') || '<p style="color:var(--text2)">No users yet</p>';
+        }
+
+        // Test Selection
+        function selectTest(testId) {
+            currentTest = testId;
+            document.getElementById('code-modal').classList.remove('hidden');
+        }
+
+        function closeCodeModal() {
+            document.getElementById('code-modal').classList.add('hidden');
+            document.getElementById('test-code-input').value = '';
+            document.getElementById('code-error').textContent = '';
+        }
+
+        function verifyCode() {
+            const code = document.getElementById('test-code-input').value.trim();
+            if (code !== 'OFUJE2024') {
+                document.getElementById('code-error').textContent = 'Invalid code';
+                return;
+            }
+            closeCodeModal();
+            joinWaitingRoom();
+        }
+
+        // Waiting Room
+        async function joinWaitingRoom() {
+            document.getElementById('dashboard').classList.add('hidden');
+            document.getElementById('waiting').classList.remove('hidden');
+            document.getElementById('waiting-test').textContent = tests[currentTest].name;
+
+            const waitingRef = db.ref('waiting/' + currentTest);
+            const snapshot = await waitingRef.once('value');
+            
+            if (snapshot.exists()) {
+                const opponent = snapshot.val();
+                if (opponent.code !== currentUser.code) {
+                    const sessionId = Date.now().toString();
+                    await db.ref('sessions/' + sessionId).set({
+                        test: currentTest,
+                        player1: {code: currentUser.code, name: currentUser.name, score: 0, question: 1, answers: [], done: false},
+                        player2: {code: opponent.code, name: opponent.name, score: 0, question: 1, answers: [], done: false},
+                        started: Date.now(),
+                        ended: false
+                    });
+                    await waitingRef.remove();
+                    startQuiz(sessionId, 'player1');
+                    return;
+                }
+            }
+            
+            await waitingRef.set({code: currentUser.code, name: currentUser.name});
+            
+            db.ref('sessions').orderByChild('test').equalTo(currentTest).on('child_added', snap => {
+                const session = snap.val();
+                if (session.player2.code === currentUser.code && !session.ended) {
+                    startQuiz(snap.key, 'player2');
+                }
+            });
+        }
+
+        function cancelWaiting() {
+            db.ref('waiting/' + currentTest).remove();
+            db.ref('sessions').off();
+            document.getElementById('waiting').classList.add('hidden');
+            document.getElementById('dashboard').classList.remove('hidden');
+        }
+
+        // Quiz
+        let myPlayer, oppPlayer;
+
+        function startQuiz(sessionId, player) {
+            currentSession = sessionId;
+            myPlayer = player;
+            oppPlayer = player === 'player1' ? 'player2' : 'player1';
+            answers = new Array(10).fill(-1);
+            timeLeft = 3600;
+            
+            document.getElementById('waiting').classList.add('hidden');
+            document.getElementById('quiz').classList.remove('hidden');
+            
+            const sessionRef = db.ref('sessions/' + sessionId);
+            sessionRef.on('value', snap => {
+                if (!snap.exists()) return;
+                const session = snap.val();
+                const me = session[myPlayer];
+                const opp = session[oppPlayer];
+                
+                document.getElementById('my-name').textContent = me.name;
+                document.getElementById('my-avatar').textContent = me.name[0].toUpperCase();
+                document.getElementById('my-question').textContent = me.question;
+                document.getElementById('my-score').textContent = me.score;
+                
+                document.getElementById('opp-name').textContent = opp.name;
+                document.getElementById('opp-avatar').textContent = opp.name[0].toUpperCase();
+                document.getElementById('opp-question').textContent = opp.question;
+                document.getElementById('opp-score').textContent = opp.score;
+                
+                if (session.ended) showResults(session);
+            });
+            
+            startTimer();
+            showQuestion(0);
+            initVoice();
+        }
+
+        function showQuestion(index) {
+            const q = tests[currentTest].questions[index];
+            document.getElementById('q-num').textContent = index + 1;
+            document.getElementById('q-text').textContent = q.q;
+            document.getElementById('options').innerHTML = q.o.map((o, i) => `
+                <div class="option ${answers[index] === i ? 'selected' : ''}" onclick="selectOption(${index}, ${i})">
+                    <span class="option-letter">${['A','B','C','D'][i]}</span>
+                    <span>${o}</span>
+                </div>
+            `).join('');
+            
+            document.getElementById('prev-btn').classList.toggle('hidden', index === 0);
+            document.getElementById('next-btn').classList.toggle('hidden', index === 9);
+            document.getElementById('submit-btn').classList.toggle('hidden', index !== 9);
+            
+            updateProgress(index + 1);
+        }
+
+        function selectOption(qIndex, oIndex) {
+            answers[qIndex] = oIndex;
+            showQuestion(qIndex);
+            calculateScore();
+        }
+
+        function calculateScore() {
+            const score = answers.reduce((acc, a, i) => 
+                a === tests[currentTest].questions[i].a ? acc + 1 : acc, 0);
+            db.ref(`sessions/${currentSession}/${myPlayer}`).update({
+                score, answers, question: answers.filter(a => a >= 0).length || 1
+            });
+        }
+
+        function prevQuestion() {
+            const current = parseInt(document.getElementById('q-num').textContent) - 1;
+            if (current > 0) showQuestion(current - 1);
+        }
+
+        function nextQuestion() {
+            const current = parseInt(document.getElementById('q-num').textContent) - 1;
+            if (current < 9) showQuestion(current + 1);
+        }
+
+        function updateProgress(q) {
+            db.ref(`sessions/${currentSession}/${myPlayer}/question`).set(q);
+        }
+
+        function startTimer() {
+            const timerEl = document.getElementById('timer');
+            timer = setInterval(() => {
+                timeLeft--;
+                const mins = Math.floor(timeLeft / 60).toString().padStart(2, '0');
+                const secs = (timeLeft % 60).toString().padStart(2, '0');
+                timerEl.textContent = `${mins}:${secs}`;
+                timerEl.classList.toggle('warning', timeLeft < 300);
+                if (timeLeft <= 0) submitQuiz();
+            }, 1000);
+        }
+
+        async function submitQuiz() {
+            clearInterval(timer);
+            calculateScore();
+            await db.ref(`sessions/${currentSession}/${myPlayer}/done`).set(true);
+            await db.ref(`sessions/${currentSession}/ended`).set(true);
+        }
+
+        async function showResults(session) {
+            document.getElementById('quiz').classList.add('hidden');
+            document.getElementById('results').classList.remove('hidden');
+            
+            const me = session[myPlayer];
+            const opp = session[oppPlayer];
+            const iWon = me.score > opp.score;
+            const isDraw = me.score === opp.score;
+            const myChange = isDraw ? 0 : (iWon ? 10 : -5);
+            const oppChange = isDraw ? 0 : (iWon ? -5 : 10);
+            
+            document.getElementById('result-my-name').textContent = me.name + (iWon && !isDraw ? ' 🏆' : '');
+            document.getElementById('result-my-score').textContent = me.score + '/10';
+            document.getElementById('result-my-change').textContent = (myChange >= 0 ? '+' : '') + myChange;
+            document.getElementById('result-my-change').className = 'result-change ' + (myChange >= 0 ? 'positive' : 'negative');
+            
+            document.getElementById('result-opp-name').textContent = opp.name + (!iWon && !isDraw ? ' 🏆' : '');
+            document.getElementById('result-opp-score').textContent = opp.score + '/10';
+            document.getElementById('result-opp-change').textContent = (oppChange >= 0 ? '+' : '') + oppChange;
+            document.getElementById('result-opp-change').className = 'result-change ' + (oppChange >= 0 ? 'positive' : 'negative');
+            
+            // Update points
+            const newPoints = (currentUser.points || 0) + myChange;
+            await db.ref(`users/${currentUser.code}/points`).set(newPoints);
+            document.getElementById('result-my-total').textContent = newPoints;
+            
+            const oppSnap = await db.ref(`users/${opp.code}/points`).once('value');
+            const oppPoints = (oppSnap.val() || 0) + oppChange;
+            await db.ref(`users/${opp.code}/points`).set(oppPoints);
+            document.getElementById('result-opp-total').textContent = oppPoints;
+            
+            // Save record
+            const record = {
+                test: tests[currentTest].name,
+                opponent: opp.name,
+                score: me.score,
+                result: isDraw ? 'draw' : (iWon ? 'win' : 'loss'),
+                date: Date.now()
+            };
+            const records = currentUser.records || [];
+            records.push(record);
+            await db.ref(`users/${currentUser.code}/records`).set(records);
+            
+            // Save opponent record
+            const oppRecordSnap = await db.ref(`users/${opp.code}/records`).once('value');
+            const oppRecords = oppRecordSnap.val() || [];
+            oppRecords.push({
+                test: tests[currentTest].name,
+                opponent: me.name,
+                score: opp.score,
+                result: isDraw ? 'draw' : (iWon ? 'loss' : 'win'),
+                date: Date.now()
+            });
+            await db.ref(`users/${opp.code}/records`).set(oppRecords);
+            
+            cleanupVoice();
+        }
+
+        function backToDashboard() {
+            document.getElementById('results').classList.add('hidden');
+            document.getElementById('dashboard').classList.remove('hidden');
+            db.ref('sessions/' + currentSession).off();
+            currentSession = null;
+            loadLeaderboard();
+            loadRecords();
+        }
+
+        // Voice Communication
+        async function initVoice() {
+            try {
+                localStream = await navigator.mediaDevices.getUserMedia({audio: true});
+                const config = {iceServers: [{urls: 'stun:stun.l.google.com:19302'}]};
+                peerConnection = new RTCPeerConnection(config);
+                
+                localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
+                
+                peerConnection.ontrack = e => {
+                    document.getElementById('remote-audio').srcObject = e.streams[0];
+                };
+                
+                peerConnection.onicecandidate = e => {
+                    if (e.candidate) {
+                        db.ref(`sessions/${currentSession}/ice/${myPlayer}`).push(e.candidate.toJSON());
+                    }
+                };
+                
+                db.ref(`sessions/${currentSession}/ice/${oppPlayer}`).on('child_added', async snap => {
+                    try {
+                        await peerConnection.addIceCandidate(new RTCIceCandidate(snap.val()));
+                    } catch(e) {}
+                });
+                
+                if (myPlayer === 'player1') {
+                    const offer = await peerConnection.createOffer();
+                    await peerConnection.setLocalDescription(offer);
+                    await db.ref(`sessions/${currentSession}/offer`).set({type: offer.type, sdp: offer.sdp});
+                    
+                    db.ref(`sessions/${currentSession}/answer`).on('value', async snap => {
+                        if (snap.exists() && peerConnection.signalingState !== 'stable') {
+                            await peerConnection.setRemoteDescription(new RTCSessionDescription(snap.val()));
+                        }
+                    });
+                } else {
+                    db.ref(`sessions/${currentSession}/offer`).on('value', async snap => {
+                        if (snap.exists()) {
+                            await peerConnection.setRemoteDescription(new RTCSessionDescription(snap.val()));
+                            const answer = await peerConnection.createAnswer();
+                            await peerConnection.setLocalDescription(answer);
+                            await db.ref(`sessions/${currentSession}/answer`).set({type: answer.type, sdp: answer.sdp});
+                        }
+                    });
+                }
+            } catch(e) { console.log('Voice init error:', e); }
+        }
+
+        function toggleMic() {
+            micOn = !micOn;
+            if (localStream) {
+                localStream.getAudioTracks().forEach(t => t.enabled = micOn);
+            }
+            const btn = document.getElementById('mic-btn');
+            btn.innerHTML = `<i class="fas fa-microphone${micOn ? '' : '-slash'}"></i>`;
+            btn.classList.toggle('active', micOn);
+            btn.classList.toggle('muted', !micOn);
+        }
+
+        function toggleSpeaker() {
+            speakerOn = !speakerOn;
+            document.getElementById('remote-audio').muted = !speakerOn;
+            const btn = document.getElementById('speaker-btn');
+            btn.innerHTML = `<i class="fas fa-volume-${speakerOn ? 'up' : 'mute'}"></i>`;
+            btn.classList.toggle('active', speakerOn);
+            btn.classList.toggle('muted', !speakerOn);
+        }
+
+        function cleanupVoice() {
+            if (localStream) localStream.getTracks().forEach(t => t.stop());
+            if (peerConnection) peerConnection.close();
+            localStream = null;
+            peerConnection = null;
+        }
+
+        // Dark Mode
+        function toggleDark() {
+            document.body.classList.toggle('dark');
+            const icon = document.querySelector('.toggle-dark i');
+            icon.className = document.body.classList.contains('dark') ? 'fas fa-sun' : 'fas fa-moon';
+            localStorage.setItem('dark', document.body.classList.contains('dark'));
+        }
+
+        // Init
+        if (localStorage.getItem('dark') === 'true') {
+            document.body.classList.add('dark');
+            document.querySelector('.toggle-dark i').className = 'fas fa-sun';
+        }
+    </script>
+</body>
+</html>
