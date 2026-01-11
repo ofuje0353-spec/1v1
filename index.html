@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ofuje - Multiplayer CBT</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+:root{--bg:#f0f4f8;--card:#fff;--text:#1a202c;--text2:#64748b;--primary:#6366f1;--primary2:#818cf8;--success:#10b981;--danger:#ef4444;--warning:#f59e0b;--border:#e2e8f0;--shadow:0 4px 20px rgba(0,0,0,0.08)}
+[data-theme="dark"]{--bg:#0f172a;--card:#1e293b;--text:#f1f5f9;--text2:#94a3b8;--border:#334155;--shadow:0 4px 20px rgba(0,0,0,0.3)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;transition:all .3s}
+.hidden{display:none!important}
+.container{max-width:1200px;margin:0 auto;padding:20px}
+.card{background:var(--card);border-radius:16px;padding:24px;box-shadow:var(--shadow);border:1px solid var(--border)}
+.btn{padding:12px 24px;border:none;border-radius:12px;cursor:pointer;font-weight:600;transition:all .3s;display:inline-flex;align-items:center;gap:8px}
+.btn-primary{background:linear-gradient(135deg,var(--primary),var(--primary2));color:#fff}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(99,102,241,0.4)}
+.btn-danger{background:var(--danger);color:#fff}
+.btn-success{background:var(--success);color:#fff}
+.btn-secondary{background:var(--border);color:var(--text)}
+input,select{width:100%;padding:14px 18px;border:2px solid var(--border);border-radius:12px;font-size:16px;background:var(--card);color:var(--text);transition:all .3s}
+input:focus,select:focus{outline:none;border-color:var(--primary)}
+.form-group{margin-bottom:20px}
+.form-group label{display:block;margin-bottom:8px;font-weight:500;color:var(--text2)}
+.toast-container{position:fixed;top:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:10px}
+.toast{padding:16px 24px;border-radius:12px;color:#fff;animation:slideIn .3s ease;display:flex;align-items:center;gap:12px;min-width:300px}
+.toast.success{background:var(--success)}.toast.error{background:var(--danger)}.toast.info{background:var(--primary)}
+@keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+.animate-in{animation:fadeIn .5s ease}
+.auth-container{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.auth-card{width:100%;max-width:420px}
+.auth-card h1{text-align:center;margin-bottom:8px;font-size:2.5rem;background:linear-gradient(135deg,var(--primary),var(--primary2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.auth-card p{text-align:center;color:var(--text2);margin-bottom:32px}
+.tabs{display:flex;gap:8px;margin-bottom:24px}
+.tab{flex:1;padding:12px;text-align:center;border-radius:10px;cursor:pointer;font-weight:500;transition:all .3s;background:var(--border);color:var(--text2)}
+.tab.active{background:var(--primary);color:#fff}
+.dashboard{display:grid;grid-template-columns:260px 1fr;min-height:100vh}
+.sidebar{background:var(--card);border-right:1px solid var(--border);padding:24px}
+.logo{font-size:1.8rem;font-weight:800;margin-bottom:40px;background:linear-gradient(135deg,var(--primary),var(--primary2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.nav-item{display:flex;align-items:center;gap:12px;padding:14px 18px;border-radius:12px;cursor:pointer;transition:all .3s;margin-bottom:8px;color:var(--text2)}
+.nav-item:hover,.nav-item.active{background:linear-gradient(135deg,var(--primary),var(--primary2));color:#fff}
+.main-content{padding:24px;overflow-y:auto;max-height:100vh}
+.header{display:flex;justify-content:space-between;align-items:center;margin-bottom:32px}
+.user-info{display:flex;align-items:center;gap:12px}
+.avatar{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--primary2));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:1.2rem}
+.theme-toggle{width:48px;height:48px;border-radius:50%;background:var(--border);border:none;cursor:pointer;color:var(--text);font-size:1.2rem}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px;margin-bottom:32px}
+.stat-card{padding:24px;border-radius:16px;background:linear-gradient(135deg,var(--primary),var(--primary2));color:#fff}
+.stat-card h3{font-size:2rem;margin-bottom:4px}
+.stat-card p{opacity:.8}
+.test-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px}
+.test-card{cursor:pointer;transition:all .3s}
+.test-card:hover{transform:translateY(-4px)}
+.test-card h3{margin-bottom:8px}
+.test-card p{color:var(--text2);font-size:.9rem}
+.badge{padding:4px 12px;border-radius:20px;font-size:.75rem;font-weight:600}
+.badge-primary{background:rgba(99,102,241,.2);color:var(--primary)}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:1000;padding:20px}
+.modal-content{background:var(--card);border-radius:20px;padding:32px;max-width:500px;width:100%;max-height:90vh;overflow-y:auto;animation:fadeIn .3s}
+.battle-arena{display:grid;grid-template-columns:1fr 1fr;gap:24px;min-height:80vh}
+.player-side{padding:24px;border-radius:20px;background:var(--card);border:2px solid var(--border)}
+.player-side.self{border-color:var(--primary)}
+.question-card{background:var(--bg);padding:24px;border-radius:16px;margin-top:20px}
+.options{display:flex;flex-direction:column;gap:12px;margin-top:20px}
+.option{padding:16px 20px;border:2px solid var(--border);border-radius:12px;cursor:pointer;transition:all .3s}
+.option:hover{border-color:var(--primary)}
+.option.selected{background:var(--primary);color:#fff;border-color:var(--primary)}
+.timer{font-size:2rem;font-weight:700;text-align:center;color:var(--primary)}
+.chat-box{position:fixed;bottom:20px;right:20px;width:350px;background:var(--card);border-radius:20px;box-shadow:var(--shadow);overflow:hidden;z-index:100}
+.chat-header{background:var(--primary);color:#fff;padding:16px;display:flex;justify-content:space-between;align-items:center}
+.chat-messages{height:300px;overflow-y:auto;padding:16px}
+.chat-input{display:flex;gap:8px;padding:16px;border-top:1px solid var(--border)}
+.chat-input input{flex:1}
+.message{margin-bottom:12px;padding:10px 14px;border-radius:12px;max-width:80%}
+.message.self{background:var(--primary);color:#fff;margin-left:auto}
+.message.other{background:var(--border)}
+.emoji-picker{display:flex;flex-wrap:wrap;gap:8px;padding:12px;border-top:1px solid var(--border)}
+.emoji-picker span{cursor:pointer;font-size:1.2rem}
+.voice-controls{display:flex;gap:8px}
+.voice-controls button{width:36px;height:36px;border-radius:50%;border:none;cursor:pointer;background:rgba(255,255,255,.2);color:#fff}
+.leaderboard-table{width:100%;border-collapse:collapse}
+.leaderboard-table th,.leaderboard-table td{padding:16px;text-align:left;border-bottom:1px solid var(--border)}
+.leaderboard-table tr:hover{background:var(--bg)}
+.rank-1{color:gold}.rank-2{color:silver}.rank-3{color:#cd7f32}
+.battle-list{display:flex;flex-direction:column;gap:12px;max-height:400px;overflow-y:auto}
+.battle-item{display:flex;justify-content:space-between;align-items:center;padding:16px;background:var(--bg);border-radius:12px}
+.waiting-screen{text-align:center;padding:60px}
+.waiting-screen .spinner{width:60px;height:60px;border:4px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 24px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.results-screen{text-align:center}
+.results-screen h2{font-size:2.5rem;margin-bottom:24px}
+.score-display{font-size:4rem;font-weight:800;color:var(--primary)}
+.point-change{font-size:1.5rem;margin-top:12px}
+.point-change.positive{color:var(--success)}
+.point-change.negative{color:var(--danger)}
+.admin-panel{padding:24px}
+.admin-tabs{display:flex;gap:12px;margin-bottom:24px}
+.data-table{width:100%;border-collapse:collapse;margin-top:20px}
+.data-table th,.data-table td{padding:12px;text-align:left;border-bottom:1px solid var(--border)}
+.data-table input{padding:8px}
+@media(max-width:900px){.dashboard{grid-template-columns:1fr}.sidebar{display:none}.battle-arena{grid-template-columns:1fr}.chat-box{width:calc(100% - 40px);bottom:10px;right:20px;left:20px}}
+.mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--card);padding:12px;border-top:1px solid var(--border);z-index:100}
+.mobile-nav-items{display:flex;justify-content:space-around}
+.mobile-nav-item{display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--text2);font-size:.75rem}
+.mobile-nav-item.active{color:var(--primary)}
+@media(max-width:900px){.mobile-nav{display:block}.main-content{padding-bottom:80px}}
+.progress-bar{height:8px;background:var(--border);border-radius:4px;overflow:hidden;margin-top:12px}
+.progress-fill{height:100%;background:var(--primary);transition:width .3s}
+.opponent-progress{background:var(--bg);padding:16px;border-radius:12px;margin-top:16px}
+    </style>
+</head>
+<body>
+<div id="toast-container" class="toast-container"></div>
+
+<!-- Auth Screen -->
+<div id="auth-screen" class="auth-container">
+    <div class="card auth-card animate-in">
+        <h1><i class="fas fa-bolt"></i> Ofuje</h1>
+        <p>Multiplayer CBT Battle Platform</p>
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab('login')">Login</div>
+            <div class="tab" onclick="switchTab('register')">Register</div>
+        </div>
+        <div id="login-form">
+            <div class="form-group">
+                <label>Access Code</label>
+                <input type="text" id="login-code" placeholder="Enter your access code">
+            </div>
+            <button class="btn btn-primary" style="width:100%" onclick="login()">
+                <i class="fas fa-sign-in-alt"></i> Login
+            </button>
+        </div>
+        <div id="register-form" class="hidden">
+            <div class="form-group">
+                <label>Full Name</label>
+                <input type="text" id="reg-name" placeholder="Enter your name">
+            </div>
+            <div class="form-group">
+                <label>School</label>
+                <input type="text" id="reg-school" placeholder="Enter your school">
+            </div>
+            <div class="form-group">
+                <label>Preferred Access Code</label>
+                <input type="text" id="reg-code" placeholder="Create your access code">
+            </div>
+            <button class="btn btn-primary" style="width:100%" onclick="register()">
+                <i class="fas fa-user-plus"></i> Register
+            </button>
+        </div>
+        <p style="text-align:center;margin-top:20px;font-size:.9rem">
+            <a href="#" onclick="showAdminLogin()" style="color:var(--primary)">Admin Login</a>
+        </p>
+    </div>
+</div>
+
+<!-- Dashboard -->
+<div id="dashboard-screen" class="dashboard hidden">
+    <aside class="sidebar">
+        <div class="logo"><i class="fas fa-bolt"></i> Ofuje</div>
+        <nav>
+            <div class="nav-item active" onclick="showSection('home')"><i class="fas fa-home"></i> Dashboard</div>
+            <div class="nav-item" onclick="showSection('tests')"><i class="fas fa-file-alt"></i> Tests</div>
+            <div class="nav-item" onclick="showSection('battles')"><i class="fas fa-swords"></i> Battles</div>
+            <div class="nav-item" onclick="showSection('leaderboard')"><i class="fas fa-trophy"></i> Leaderboard</div>
+            <div class="nav-item" onclick="showSection('records')"><i class="fas fa-history"></i> Records</div>
+            <div class="nav-item" onclick="showSection('settings')"><i class="fas fa-cog"></i> Settings</div>
+            <div class="nav-item" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</div>
+        </nav>
+    </aside>
+    <main class="main-content">
+        <div class="header">
+            <div class="user-info">
+                <div class="avatar" id="user-avatar">U</div>
+                <div>
+                    <h3 id="user-name">User</h3>
+                    <p style="color:var(--text2);font-size:.9rem" id="user-school">School</p>
+                </div>
+            </div>
+            <button class="theme-toggle" onclick="toggleTheme()"><i class="fas fa-moon"></i></button>
+        </div>
+        
+        <!-- Home Section -->
+        <section id="section-home" class="animate-in">
+            <div class="stats-grid">
+                <div class="stat-card"><h3 id="stat-points">0</h3><p>Total Points</p></div>
+                <div class="stat-card" style="background:linear-gradient(135deg,#10b981,#34d399)"><h3 id="stat-wins">0</h3><p>Wins</p></div>
+                <div class="stat-card" style="background:linear-gradient(135deg,#f59e0b,#fbbf24)"><h3 id="stat-battles">0</h3><p>Battles</p></div>
+            </div>
+            <h2 style="margin-bottom:20px">Quick Actions</h2>
+            <div class="test-grid">
+                <div class="card test-card" onclick="showSection('tests')">
+                    <i class="fas fa-play-circle" style="font-size:2rem;color:var(--primary);margin-bottom:12px"></i>
+                    <h3>Start New Battle</h3>
+                    <p>Challenge other users in a quiz battle</p>
+                </div>
+                <div class="card test-card" onclick="showSection('leaderboard')">
+                    <i class="fas fa-trophy" style="font-size:2rem;color:var(--warning);margin-bottom:12px"></i>
+                    <h3>View Leaderboard</h3>
+                    <p>See where you rank among others</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tests Section -->
+        <section id="section-tests" class="hidden animate-in">
+            <h2 style="margin-bottom:20px">Available Tests</h2>
+            <div id="tests-list" class="test-grid"></div>
+        </section>
+
+        <!-- Battles Section -->
+        <section id="section-battles" class="hidden animate-in">
+            <h2 style="margin-bottom:20px">Battle Arena</h2>
+            <div style="display:flex;gap:12px;margin-bottom:24px">
+                <button class="btn btn-primary" onclick="showCreateBattle()"><i class="fas fa-plus"></i> Create Battle</button>
+                <button class="btn btn-secondary" onclick="loadBattles()"><i class="fas fa-sync"></i> Refresh</button>
+            </div>
+            <div class="card">
+                <h3 style="margin-bottom:16px">Open Battles</h3>
+                <div id="battles-list" class="battle-list"></div>
+            </div>
+        </section>
+
+        <!-- Leaderboard Section -->
+        <section id="section-leaderboard" class="hidden animate-in">
+            <h2 style="margin-bottom:20px">Leaderboard</h2>
+            <div class="card">
+                <table class="leaderboard-table">
+                    <thead><tr><th>Rank</th><th>User</th><th>School</th><th>Points</th></tr></thead>
+                    <tbody id="leaderboard-body"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Records Section -->
+        <section id="section-records" class="hidden animate-in">
+            <h2 style="margin-bottom:20px">Battle History</h2>
+            <div class="card">
+                <table class="leaderboard-table">
+                    <thead><tr><th>Date</th><th>Test</th><th>Opponent</th><th>Score</th><th>Result</th></tr></thead>
+                    <tbody id="records-body"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Settings Section -->
+        <section id="section-settings" class="hidden animate-in">
+            <h2 style="margin-bottom:20px">Settings</h2>
+            <div class="card" style="max-width:500px">
+                <div class="form-group">
+                    <label>Name</label>
+                    <input type="text" id="settings-name">
+                </div>
+                <div class="form-group">
+                    <label>Access Code</label>
+                    <input type="text" id="settings-code">
+                </div>
+                <button class="btn btn-primary" onclick="updateProfile()"><i class="fas fa-save"></i> Save Changes</button>
+                <hr style="margin:24px 0;border-color:var(--border)">
+                <button class="btn btn-danger" onclick="deleteAccount()"><i class="fas fa-trash"></i> Delete Account</button>
+            </div>
+        </section>
+    </main>
+    <div class="mobile-nav">
+        <div class="mobile-nav-items">
+            <div class="mobile-nav-item active" onclick="showSection('home')"><i class="fas fa-home"></i><span>Home</span></div>
+            <div class="mobile-nav-item" onclick="showSection('tests')"><i class="fas fa-file-alt"></i><span>Tests</span></div>
+            <div class="mobile-nav-item" onclick="showSection('battles')"><i class="fas fa-gamepad"></i><span>Battles</span></div>
+            <div class="mobile-nav-item" onclick="showSection('leaderboard')"><i class="fas fa-trophy"></i><span>Rank</span></div>
+            <div class="mobile-nav-item" onclick="showSection('settings')"><i class="fas fa-cog"></i><span>Settings</span></div>
+        </div>
+    </div>
+</div>
+
+<!-- Battle Screen -->
+<div id="battle-screen" class="hidden" style="padding:20px">
+    <div id="waiting-room" class="card waiting-screen">
+        <div class="spinner"></div>
+        <h2>Waiting for opponent...</h2>
+        <p style="color:var(--text2);margin-top:12px">Share the battle code with your opponent</p>
+        <h3 style="margin-top:20px;color:var(--primary)" id="battle-code-display"></h3>
+        <button class="btn btn-danger" style="margin-top:24px" onclick="leaveBattle()">Cancel</button>
+    </div>
+    <div id="battle-arena" class="battle-arena hidden">
+        <div class="player-side self">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+                <div class="user-info">
+                    <div class="avatar" id="p1-avatar">Y</div>
+                    <div><h4 id="p1-name">You</h4><span class="badge badge-primary">You</span></div>
+                </div>
+                <div class="timer" id="timer">60:00</div>
+            </div>
+            <div class="question-card">
+                <p style="color:var(--text2);margin-bottom:8px">Question <span id="q-num">1</span>/2</p>
+                <h3 id="question-text">Loading...</h3>
+                <div class="options" id="options-container"></div>
+            </div>
+            <div style="display:flex;gap:12px;margin-top:20px">
+                <button class="btn btn-secondary" id="prev-btn" onclick="prevQuestion()"><i class="fas fa-arrow-left"></i> Prev</button>
+                <button class="btn btn-secondary" id="next-btn" onclick="nextQuestion()">Next <i class="fas fa-arrow-right"></i></button>
+                <button class="btn btn-success" onclick="submitBattle()"><i class="fas fa-check"></i> Submit</button>
+            </div>
+        </div>
+        <div class="player-side">
+            <div class="user-info">
+                <div class="avatar" id="p2-avatar">O</div>
+                <div><h4 id="p2-name">Opponent</h4><span class="badge badge-primary">Opponent</span></div>
+            </div>
+            <div class="opponent-progress">
+                <p style="color:var(--text2)">Opponent's Progress</p>
+                <h3 style="margin-top:8px">Question <span id="opp-q-num">1</span>/2</h3>
+                <div class="progress-bar"><div class="progress-fill" id="opp-progress" style="width:50%"></div></div>
+            </div>
+        </div>
+    </div>
+    <div id="results-screen" class="card results-screen hidden" style="max-width:600px;margin:40px auto">
+        <h2 id="result-title">Battle Complete!</h2>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:32px">
+            <div class="card" style="text-align:center">
+                <h4 style="color:var(--text2)">Your Score</h4>
+                <div class="score-display" id="your-score">0</div>
+                <div class="point-change" id="your-points">+0 pts</div>
+            </div>
+            <div class="card" style="text-align:center">
+                <h4 style="color:var(--text2)">Opponent's Score</h4>
+                <div class="score-display" id="opp-score">0</div>
+            </div>
+        </div>
+        <button class="btn btn-primary" style="margin-top:32px" onclick="backToDashboard()">Back to Dashboard</button>
+    </div>
+</div>
+
+<!-- Chat Box -->
+<div id="chat-box" class="chat-box hidden">
+    <div class="chat-header">
+        <span><i class="fas fa-comments"></i> Chat</span>
+        <div class="voice-controls">
+            <button onclick="toggleMic()" id="mic-btn"><i class="fas fa-microphone"></i></button>
+            <button onclick="toggleSpeaker()" id="speaker-btn"><i class="fas fa-volume-up"></i></button>
+            <button onclick="toggleChat()"><i class="fas fa-times"></i></button>
+        </div>
+    </div>
+    <div class="chat-messages" id="chat-messages"></div>
+    <div class="emoji-picker" id="emoji-picker">
+        <span onclick="addEmoji('😀')">😀</span><span onclick="addEmoji('😂')">😂</span><span onclick="addEmoji('🎉')">🎉</span>
+        <span onclick="addEmoji('👍')">👍</span><span onclick="addEmoji('❤️')">❤️</span><span onclick="addEmoji('🔥')">🔥</span>
+        <span onclick="addEmoji('💪')">💪</span><span onclick="addEmoji('🏆')">🏆</span><span onclick="addEmoji('😎')">😎</span>
+    </div>
+    <div class="chat-input">
+        <input type="text" id="chat-input" placeholder="Type a message..." onkeypress="if(event.key==='Enter')sendMessage()">
+        <button class="btn btn-primary" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
+    </div>
+</div>
+<button id="chat-toggle" class="btn btn-primary hidden" style="position:fixed;bottom:20px;right:20px;border-radius:50%;width:60px;height:60px" onclick="toggleChat()">
+    <i class="fas fa-comments"></i>
+</button>
+
+<!-- Admin Panel -->
+<div id="admin-screen" class="hidden" style="padding:20px">
+    <div class="container">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px">
+            <h1><i class="fas fa-shield-alt"></i> Admin Panel</h1>
+            <button class="btn btn-secondary" onclick="adminLogout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+        </div>
+        <div class="admin-tabs">
+            <button class="btn btn-primary" onclick="showAdminTab('users')">Users</button>
+            <button class="btn btn-secondary" onclick="showAdminTab('tests')">Tests</button>
+            <button class="btn btn-secondary" onclick="showAdminTab('questions')">Questions</button>
+        </div>
+        <div id="admin-users" class="card">
+            <h3>Manage Users</h3>
+            <table class="data-table">
+                <thead><tr><th>Name</th><th>School</th><th>Code</th><th>Points</th><th>Status</th><th>Actions</th></tr></thead>
+                <tbody id="admin-users-body"></tbody>
+            </table>
+        </div>
+        <div id="admin-tests" class="card hidden">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+                <h3>Manage Tests</h3>
+                <button class="btn btn-primary" onclick="showAddTest()"><i class="fas fa-plus"></i> Add Test</button>
+            </div>
+            <table class="data-table">
+                <thead><tr><th>Name</th><th>Code</th><th>Questions</th><th>Actions</th></tr></thead>
+                <tbody id="admin-tests-body"></tbody>
+            </table>
+        </div>
+        <div id="admin-questions" class="card hidden">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+                <h3>Manage Questions</h3>
+                <button class="btn btn-primary" onclick="showAddQuestion()"><i class="fas fa-plus"></i> Add Question</button>
+            </div>
+            <select id="question-test-select" style="margin-bottom:16px" onchange="loadTestQuestions()">
+                <option value="">Select a test</option>
+            </select>
+            <div id="questions-list"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Modals -->
+<div id="modal" class="modal hidden">
+    <div class="modal-content" id="modal-content"></div>
+</div>
+
+<script type="module">
+import{initializeApp}from"https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+import{getDatabase,ref,set,get,push,onValue,update,remove,onDisconnect}from"https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js";
+
+const firebaseConfig={apiKey: "AIzaSyDofEQ2jiMIXji7y-fGopDQcLY8dhixGk4",
+  authDomain: "danz-66ffa.firebaseapp.com",
+  projectId: "danz-66ffa",
+  storageBucket: "danz-66ffa.firebasestorage.app",
+  messagingSenderId: "570041531960",
+  appId: "1:570041531960:web:24b77baa80aba9636c30cd"};
+
+const app=initializeApp(firebaseConfig);
+const db=getDatabase(app);
+
+let currentUser=null,currentBattle=null,currentTest=null,battleQuestions=[],userAnswers=[],currentQ=0,timerInterval=null,micEnabled=true,speakerEnabled=true;
+
+const $=id=>document.getElementById(id);
+const toast=(msg,type='info')=>{const t=document.createElement('div');t.className=`toast ${type}`;t.innerHTML=`<i class="fas fa-${type==='success'?'check-circle':type==='error'?'exclamation-circle':'info-circle'}"></i>${msg}`;$('toast-container').appendChild(t);setTimeout(()=>t.remove(),3000)};
+
+// Default data
+const defaultTests=[
+    {id:'testA',name:'General Knowledge',code:'GK2024',questions:[
+        {q:'What is the capital of France?',options:['London','Paris','Berlin','Madrid'],answer:1},
+        {q:'Which planet is known as the Red Planet?',options:['Venus','Mars','Jupiter','Saturn'],answer:1}
+    ]},
+    {id:'testB',name:'Science Quiz',code:'SC2024',questions:[
+        {q:'What is H2O commonly known as?',options:['Hydrogen','Oxygen','Water','Carbon'],answer:2},
+        {q:'What is the speed of light?',options:['300,000 km/s','150,000 km/s','500,000 km/s','1,000 km/s'],answer:0}
+    ]}
+];
+
+async function initApp(){
+    const testsRef=ref(db,'tests');
+    const snap=await get(testsRef);
+    if(!snap.exists()){
+        for(const t of defaultTests)await set(ref(db,`tests/${t.id}`),{name:t.name,code:t.code,questions:t.questions});
+    }
+    const saved=localStorage.getItem('ofuje_user');
+    if(saved){
+        const code=JSON.parse(saved);
+        const userSnap=await get(ref(db,`users/${code}`));
+        if(userSnap.exists()){currentUser={code,...userSnap.val()};showDashboard();}
+    }
+    if(localStorage.getItem('theme')==='dark')document.documentElement.setAttribute('data-theme','dark');
+}
+
+window.switchTab=tab=>{
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    event.target.classList.add('active');
+    $('login-form').classList.toggle('hidden',tab!=='login');
+    $('register-form').classList.toggle('hidden',tab==='login');
+};
+
+window.login=async()=>{
+    const code=$('login-code').value.trim();
+    if(!code)return toast('Enter access code','error');
+    const snap=await get(ref(db,`users/${code}`));
+    if(!snap.exists())return toast('Invalid access code','error');
+    const userData=snap.val();
+    if(userData.restricted)return toast('Account restricted','error');
+    currentUser={code,...userData};
+    localStorage.setItem('ofuje_user',JSON.stringify(code));
+    toast('Welcome back!','success');
+    showDashboard();
+};
+
+window.register=async()=>{
+    const name=$('reg-name').value.trim(),school=$('reg-school').value.trim(),code=$('reg-code').value.trim();
+    if(!name||!school||!code)return toast('Fill all fields','error');
+    const exists=await get(ref(db,`users/${code}`));
+    if(exists.exists())return toast('Code already taken','error');
+    await set(ref(db,`users/${code}`),{name,school,points:0,wins:0,battles:0,restricted:false});
+    currentUser={code,name,school,points:0,wins:0,battles:0};
+    localStorage.setItem('ofuje_user',JSON.stringify(code));
+    toast('Registration successful!','success');
+    showDashboard();
+};
+
+function showDashboard(){
+    $('auth-screen').classList.add('hidden');
+    $('dashboard-screen').classList.remove('hidden');
+    $('user-avatar').textContent=currentUser.name[0].toUpperCase();
+    $('user-name').textContent=currentUser.name;
+    $('user-school').textContent=currentUser.school;
+    loadStats();loadTests();loadLeaderboard();loadRecords();
+    $('settings-name').value=currentUser.name;
+    $('settings-code').value=currentUser.code;
+}
+
+async function loadStats(){
+    const snap=await get(ref(db,`users/${currentUser.code}`));
+    if(snap.exists()){
+        const d=snap.val();
+        $('stat-points').textContent=d.points||0;
+        $('stat-wins').textContent=d.wins||0;
+        $('stat-battles').textContent=d.battles||0;
+    }
+}
+
+async function loadTests(){
+    const snap=await get(ref(db,'tests'));
+    const c=$('tests-list');c.innerHTML='';
+    if(snap.exists()){
+        Object.entries(snap.val()).forEach(([id,t])=>{
+            c.innerHTML+=`<div class="card test-card" onclick="selectTest('${id}')">
+                <i class="fas fa-file-alt" style="font-size:2rem;color:var(--primary);margin-bottom:12px"></i>
+                <h3>${t.name}</h3><p>${t.questions?.length||0} Questions</p>
+                <span class="badge badge-primary" style="margin-top:8px">Code Required</span></div>`;
+        });
+    }
+}
+
+window.selectTest=async id=>{
+    const snap=await get(ref(db,`tests/${id}`));
+    if(!snap.exists())return;
+    currentTest={id,...snap.val()};
+    $('modal-content').innerHTML=`<h2 style="margin-bottom:20px">Enter Test Code</h2>
+        <div class="form-group"><label>6-digit Code for ${currentTest.name}</label>
+        <input type="text" id="test-code-input" placeholder="Enter test code" maxlength="6"></div>
+        <div style="display:flex;gap:12px"><button class="btn btn-primary" onclick="verifyTestCode()">Verify</button>
+        <button class="btn btn-secondary" onclick="closeModal()">Cancel</button></div>`;
+    $('modal').classList.remove('hidden');
+};
+
+window.verifyTestCode=()=>{
+    const code=$('test-code-input').value.trim();
+    if(code!==currentTest.code)return toast('Invalid test code','error');
+    closeModal();showSection('battles');loadBattles();
+};
+
+window.showSection=section=>{
+    document.querySelectorAll('[id^="section-"]').forEach(s=>s.classList.add('hidden'));
+    $(`section-${section}`)?.classList.remove('hidden');
+    document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+    document.querySelectorAll('.mobile-nav-item').forEach(n=>n.classList.remove('active'));
+    if(section==='leaderboard')loadLeaderboard();
+    if(section==='battles')loadBattles();
+};
+
+async function loadLeaderboard(){
+    const snap=await get(ref(db,'users'));
+    const body=$('leaderboard-body');body.innerHTML='';
+    if(snap.exists()){
+        const users=Object.entries(snap.val()).map(([code,u])=>({code,...u})).sort((a,b)=>(b.points||0)-(a.points||0));
+        users.forEach((u,i)=>{
+            const isMe=u.code===currentUser.code;
+            body.innerHTML+=`<tr style="${isMe?'background:rgba(99,102,241,0.1)':''}">
+                <td class="${i<3?`rank-${i+1}`:''}">#${i+1}</td>
+                <td><div style="display:flex;align-items:center;gap:8px">
+                <div class="avatar" style="width:32px;height:32px;font-size:.8rem">${u.name[0]}</div>${u.name}${isMe?' (You)':''}</div></td>
+                <td>${u.school}</td><td><strong>${u.points||0}</strong> pts</td></tr>`;
+        });
+    }
+}
+
+async function loadRecords(){
+    const snap=await get(ref(db,`records/${currentUser.code}`));
+    const body=$('records-body');body.innerHTML='';
+    if(snap.exists()){
+        Object.values(snap.val()).reverse().forEach(r=>{
+            body.innerHTML+=`<tr><td>${new Date(r.date).toLocaleDateString()}</td><td>${r.testName}</td>
+                <td>${r.opponent}</td><td>${r.score}/${r.total}</td>
+                <td><span class="badge" style="background:${r.result==='win'?'var(--success)':r.result==='loss'?'var(--danger)':'var(--warning)'};color:#fff">${r.result}</span></td></tr>`;
+        });
+    }
+}
+
+async function loadBattles(){
+    const snap=await get(ref(db,'battles'));
+    const list=$('battles-list');list.innerHTML='';
+    if(snap.exists()){
+        Object.entries(snap.val()).filter(([,b])=>b.status==='waiting'&&b.testId===currentTest?.id).forEach(([id,b])=>{
+            list.innerHTML+=`<div class="battle-item">
+                <div><strong>${b.creatorName}</strong><p style="color:var(--text2);font-size:.9rem">${b.testName}</p></div>
+                <button class="btn btn-primary" onclick="joinBattle('${id}')">Join</button></div>`;
+        });
+    }
+    if(!list.innerHTML)list.innerHTML='<p style="text-align:center;color:var(--text2);padding:20px">No open battles. Create one!</p>';
+}
+
+window.showCreateBattle=()=>{
+    if(!currentTest)return toast('Select a test first','error');
+    $('modal-content').innerHTML=`<h2 style="margin-bottom:20px">Create Battle</h2>
+        <p>Test: <strong>${currentTest.name}</strong></p>
+        <p style="margin-top:12px;color:var(--text2)">Wait for an opponent to join your battle.</p>
+        <button class="btn btn-primary" style="margin-top:20px" onclick="createBattle()">Create</button>`;
+    $('modal').classList.remove('hidden');
+};
+
+window.createBattle=async()=>{
+    const battleRef=push(ref(db,'battles'));
+    const battleId=battleRef.key;
+    await set(battleRef,{
+        testId:currentTest.id,testName:currentTest.name,
+        creatorId:currentUser.code,creatorName:currentUser.name,
+        status:'waiting',players:{[currentUser.code]:{name:currentUser.name,currentQ:0,answers:[],submitted:false}},
+        chat:[],createdAt:Date.now()
+    });
+    currentBattle=battleId;
+    closeModal();startBattle();
+};
+
+window.joinBattle=async id=>{
+    currentBattle=id;
+    await update(ref(db,`battles/${id}`),{status:'active',[`players/${currentUser.code}`]:{name:currentUser.name,currentQ:0,answers:[],submitted:false}});
+    startBattle();
+};
+
+async function startBattle(){
+    $('dashboard-screen').classList.add('hidden');
+    $('battle-screen').classList.remove('hidden');
+    $('waiting-room').classList.remove('hidden');
+    $('battle-arena').classList.add('hidden');
+    $('results-screen').classList.add('hidden');
+    $('chat-toggle').classList.remove('hidden');
+    $('battle-code-display').textContent=`Battle ID: ${currentBattle.slice(-6).toUpperCase()}`;
+    
+    const testSnap=await get(ref(db,`tests/${currentTest.id}`));
+    battleQuestions=testSnap.val().questions;
+    userAnswers=new Array(battleQuestions.length).fill(-1);
+    currentQ=0;
+    
+    onValue(ref(db,`battles/${currentBattle}`),snap=>{
+        if(!snap.exists())return;
+        const battle=snap.val();
+        const players=Object.keys(battle.players||{});
+        
+        if(players.length>=2&&battle.status==='active'){
+            $('waiting-room').classList.add('hidden');
+            $('battle-arena').classList.remove('hidden');
+            
+            const opponent=players.find(p=>p!==currentUser.code);
+            const oppData=battle.players[opponent];
+            $('p1-name').textContent=currentUser.name;
+            $('p1-avatar').textContent=currentUser.name[0];
+            $('p2-name').textContent=oppData.name;
+            $('p2-avatar').textContent=oppData.name[0];
+            $('opp-q-num').textContent=(oppData.currentQ||0)+1;
+            $('opp-progress').style.width=`${((oppData.currentQ||0)+1)/battleQuestions.length*100}%`;
+            
+            if(oppData.submitted&&!battle.players[currentUser.code].submitted)submitBattle();
+            if(battle.players[currentUser.code].submitted&&oppData.submitted)showResults(battle);
+            
+            renderQuestion();
+            if(!timerInterval)startTimer(3600);
+        }
+        
+        // Chat
+        const msgs=$('chat-messages');
+        msgs.innerHTML='';
+        (battle.chat||[]).forEach(m=>{
+            msgs.innerHTML+=`<div class="message ${m.sender===currentUser.code?'self':'other'}">${m.text}</div>`;
+        });
+        msgs.scrollTop=msgs.scrollHeight;
+    });
+}
+
+function renderQuestion(){
+    const q=battleQuestions[currentQ];
+    $('q-num').textContent=currentQ+1;
+    $('question-text').textContent=q.q;
+    const opts=$('options-container');opts.innerHTML='';
+    q.options.forEach((o,i)=>{
+        opts.innerHTML+=`<div class="option ${userAnswers[currentQ]===i?'selected':''}" onclick="selectOption(${i})">${o}</div>`;
+    });
+    $('prev-btn').disabled=currentQ===0;
+    $('next-btn').disabled=currentQ===battleQuestions.length-1;
+}
+
+window.selectOption=i=>{
+    userAnswers[currentQ]=i;
+    update(ref(db,`battles/${currentBattle}/players/${currentUser.code}`),{answers:userAnswers});
+    renderQuestion();
+};
+
+window.nextQuestion=()=>{if(currentQ<battleQuestions.length-1){currentQ++;renderQuestion();updateProgress();}};
+window.prevQuestion=()=>{if(currentQ>0){currentQ--;renderQuestion();updateProgress();}};
+
+function updateProgress(){
+    update(ref(db,`battles/${currentBattle}/players/${currentUser.code}`),{currentQ});
+}
+
+function startTimer(seconds){
+    let remaining=seconds;
+    timerInterval=setInterval(()=>{
+        remaining--;
+        const m=Math.floor(remaining/60),s=remaining%60;
+        $('timer').textContent=`${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+        if(remaining<=0){clearInterval(timerInterval);submitBattle();}
+    },1000);
+}
+
+window.submitBattle=async()=>{
+    clearInterval(timerInterval);
+    await update(ref(db,`battles/${currentBattle}/players/${currentUser.code}`),{submitted:true,answers:userAnswers});
+    toast('Answers submitted!','success');
+};
+
+async function showResults(battle){
+    $('battle-arena').classList.add('hidden');
+    $('results-screen').classList.remove('hidden');
+    $('chat-toggle').classList.add('hidden');
+    
+    const players=Object.entries(battle.players);
+    const myData=battle.players[currentUser.code];
+    const opponent=players.find(([code])=>code!==currentUser.code);
+    const [oppCode,oppData]=opponent;
+    
+    let myScore=0,oppScore=0;
+    battleQuestions.forEach((q,i)=>{
+        if(myData.answers[i]===q.answer)myScore++;
+        if(oppData.answers[i]===q.answer)oppScore++;
+    });
+    
+    $('your-score').textContent=myScore;
+    $('opp-score').textContent=oppScore;
+    
+    let pointChange=0,result='draw';
+    if(myScore>oppScore){pointChange=10;result='win';}
+    else if(myScore<oppScore){pointChange=-5;result='loss';}
+    
+    const userSnap=await get(ref(db,`users/${currentUser.code}`));
+    const userData=userSnap.val();
+    let newPoints=Math.max(0,(userData.points||0)+pointChange);
+    if(pointChange<0&&userData.points<5)newPoints=userData.points;
+    
+    await update(ref(db,`users/${currentUser.code}`),{
+        points:newPoints,
+        battles:(userData.battles||0)+1,
+        wins:result==='win'?(userData.wins||0)+1:userData.wins||0
+    });
+    
+    await push(ref(db,`records/${currentUser.code}`),{
+        testName:currentTest.name,opponent:oppData.name,
+        score:myScore,total:battleQuestions.length,
+        result,date:Date.now()
+    });
+    
+    $('your-points').textContent=`${pointChange>=0?'+':''}${pointChange} pts`;
+    $('your-points').className=`point-change ${pointChange>=0?'positive':'negative'}`;
+    $('result-title').textContent=result==='win'?'🎉 Victory!':result==='loss'?'😔 Defeat':'🤝 Draw';
+}
+
+window.leaveBattle=async()=>{
+    if(currentBattle)await remove(ref(db,`battles/${currentBattle}`));
+    backToDashboard();
+};
+
+window.backToDashboard=()=>{
+    $('battle-screen').classList.add('hidden');
+    $('dashboard-screen').classList.remove('hidden');
+    $('chat-box').classList.add('hidden');
+    $('chat-toggle').classList.add('hidden');
+    currentBattle=null;currentTest=null;
+    if(timerInterval)clearInterval(timerInterval);
+    loadStats();loadLeaderboard();loadRecords();
+};
+
+window.toggleChat=()=>$('chat-box').classList.toggle('hidden');
+
+window.sendMessage=async()=>{
+    const input=$('chat-input'),text=input.value.trim();
+    if(!text)return;
+    await push(ref(db,`battles/${currentBattle}/chat`),{sender:currentUser.code,text,time:Date.now()});
+    input.value='';
+};
+
+window.addEmoji=e=>{$('chat-input').value+=e;};
+
+window.toggleMic=()=>{micEnabled=!micEnabled;$('mic-btn').innerHTML=`<i class="fas fa-microphone${micEnabled?'':'-slash'}"></i>`;};
+window.toggleSpeaker=()=>{speakerEnabled=!speakerEnabled;$('speaker-btn').innerHTML=`<i class="fas fa-volume-${speakerEnabled?'up':'mute'}"></i>`;};
+
+window.toggleTheme=()=>{
+    const dark=document.documentElement.getAttribute('data-theme')==='dark';
+    document.documentElement.setAttribute('data-theme',dark?'':'dark');
+    localStorage.setItem('theme',dark?'':'dark');
+};
+
+window.updateProfile=async()=>{
+    const name=$('settings-name').value.trim(),code=$('settings-code').value.trim();
+    if(!name||!code)return toast('Fill all fields','error');
+    if(code!==currentUser.code){
+        const exists=await get(ref(db,`users/${code}`));
+        if(exists.exists())return toast('Code already taken','error');
+        await set(ref(db,`users/${code}`),{...currentUser,name});
+        await remove(ref(db,`users/${currentUser.code}`));
+        currentUser.code=code;
+        localStorage.setItem('ofuje_user',JSON.stringify(code));
+    }else{
+        await update(ref(db,`users/${currentUser.code}`),{name});
+    }
+    currentUser.name=name;
+    $('user-name').textContent=name;
+    $('user-avatar').textContent=name[0];
+    toast('Profile updated!','success');
+};
+
+window.deleteAccount=async()=>{
+    if(!confirm('Delete your account permanently?'))return;
+    await remove(ref(db,`users/${currentUser.code}`));
+    await remove(ref(db,`records/${currentUser.code}`));
+    localStorage.removeItem('ofuje_user');
+    location.reload();
+};
+
+window.logout=()=>{localStorage.removeItem('ofuje_user');location.reload();};
+window.closeModal=()=>$('modal').classList.add('hidden');
+
+// Admin
+window.showAdminLogin=()=>{
+    $('modal-content').innerHTML=`<h2 style="margin-bottom:20px">Admin Login</h2>
+        <div class="form-group"><label>Admin Password</label><input type="password" id="admin-pass"></div>
+        <button class="btn btn-primary" onclick="adminLogin()">Login</button>`;
+    $('modal').classList.remove('hidden');
+};
+
+window.adminLogin=()=>{
+    if($('admin-pass').value==='admin123'){
+        closeModal();
+        $('auth-screen').classList.add('hidden');
+        $('admin-screen').classList.remove('hidden');
+        loadAdminData();
+    }else toast('Invalid password','error');
+};
+
+window.adminLogout=()=>{$('admin-screen').classList.add('hidden');$('auth-screen').classList.remove('hidden');};
+
+async function loadAdminData(){
+    const usersSnap=await get(ref(db,'users'));
+    const testsSnap=await get(ref(db,'tests'));
+    
+    const usersBody=$('admin-users-body');usersBody.innerHTML='';
+    if(usersSnap.exists()){
+        Object.entries(usersSnap.val()).forEach(([code,u])=>{
+            usersBody.innerHTML+=`<tr>
+                <td>${u.name}</td><td>${u.school}</td><td>${code}</td>
+                <td><input type="number" value="${u.points||0}" style="width:80px" onchange="updateUserPoints('${code}',this.value)"></td>
+                <td>${u.restricted?'Restricted':'Active'}</td>
+                <td><button class="btn btn-secondary" onclick="toggleRestrict('${code}',${!u.restricted})">${u.restricted?'Unrestrict':'Restrict'}</button>
+                <button class="btn btn-danger" onclick="deleteUser('${code}')"><i class="fas fa-trash"></i></button></td></tr>`;
+        });
+    }
+    
+    const testsBody=$('admin-tests-body');testsBody.innerHTML='';
+    const testSelect=$('question-test-select');testSelect.innerHTML='<option value="">Select a test</option>';
+    if(testsSnap.exists()){
+        Object.entries(testsSnap.val()).forEach(([id,t])=>{
+            testsBody.innerHTML+=`<tr><td>${t.name}</td><td>${t.code}</td><td>${t.questions?.length||0}</td>
+                <td><button class="btn btn-danger" onclick="deleteTest('${id}')"><i class="fas fa-trash"></i></button></td></tr>`;
+            testSelect.innerHTML+=`<option value="${id}">${t.name}</option>`;
+        });
+    }
+}
+
+window.showAdminTab=tab=>{
+    ['users','tests','questions'].forEach(t=>$(`admin-${t}`).classList.toggle('hidden',t!==tab));
+};
+
+window.updateUserPoints=async(code,pts)=>{await update(ref(db,`users/${code}`),{points:parseInt(pts)});toast('Points updated','success');};
+window.toggleRestrict=async(code,val)=>{await update(ref(db,`users/${code}`),{restricted:val});loadAdminData();toast('User updated','success');};
+window.deleteUser=async code=>{if(confirm('Delete this user?')){await remove(ref(db,`users/${code}`));loadAdminData();toast('User deleted','success');}};
+window.deleteTest=async id=>{if(confirm('Delete this test?')){await remove(ref(db,`tests/${id}`));loadAdminData();toast('Test deleted','success');}};
+
+window.showAddTest=()=>{
+    $('modal-content').innerHTML=`<h2 style="margin-bottom:20px">Add Test</h2>
+        <div class="form-group"><label>Test Name</label><input type="text" id="new-test-name"></div>
+        <div class="form-group"><label>Test Code (6 chars)</label><input type="text" id="new-test-code" maxlength="6"></div>
+        <button class="btn btn-primary" onclick="addTest()">Add Test</button>`;
+    $('modal').classList.remove('hidden');
+};
+
+window.addTest=async()=>{
+    const name=$('new-test-name').value.trim(),code=$('new-test-code').value.trim();
+    if(!name||!code)return toast('Fill all fields','error');
+    const testRef=push(ref(db,'tests'));
+    await set(testRef,{name,code,questions:[]});
+    closeModal();loadAdminData();toast('Test added','success');
+};
+
+window.loadTestQuestions=async()=>{
+    const testId=$('question-test-select').value;
+    if(!testId)return;
+    const snap=await get(ref(db,`tests/${testId}/questions`));
+    const list=$('questions-list');list.innerHTML='';
+    if(snap.exists()){
+        snap.val().forEach((q,i)=>{
+            list.innerHTML+=`<div class="card" style="margin-bottom:12px">
+                <p><strong>Q${i+1}:</strong> ${q.q}</p>
+                <p style="color:var(--text2);font-size:.9rem">Answer: ${q.options[q.answer]}</p>
+                <button class="btn btn-danger" style="margin-top:8px" onclick="deleteQuestion('${testId}',${i})"><i class="fas fa-trash"></i></button></div>`;
+        });
+    }
+};
+
+window.showAddQuestion=()=>{
+    const testId=$('question-test-select').value;
+    if(!testId)return toast('Select a test first','error');
+    $('modal-content').innerHTML=`<h2 style="margin-bottom:20px">Add Question</h2>
+        <div class="form-group"><label>Question</label><input type="text" id="new-q-text"></div>
+        <div class="form-group"><label>Option A</label><input type="text" id="new-q-a"></div>
+        <div class="form-group"><label>Option B</label><input type="text" id="new-q-b"></div>
+        <div class="form-group"><label>Option C</label><input type="text" id="new-q-c"></div>
+        <div class="form-group"><label>Option D</label><input type="text" id="new-q-d"></div>
+        <div class="form-group"><label>Correct Answer</label>
+        <select id="new-q-answer"><option value="0">A</option><option value="1">B</option><option value="2">C</option><option value="3">D</option></select></div>
+        <button class="btn btn-primary" onclick="addQuestion('${testId}')">Add</button>`;
+    $('modal').classList.remove('hidden');
+};
+
+window.addQuestion=async testId=>{
+    const q=$('new-q-text').value,a=$('new-q-a').value,b=$('new-q-b').value,c=$('new-q-c').value,d=$('new-q-d').value,ans=parseInt($('new-q-answer').value);
+    if(!q||!a||!b||!c||!d)return toast('Fill all fields','error');
+    const snap=await get(ref(db,`tests/${testId}/questions`));
+    const questions=snap.exists()?snap.val():[];
+    questions.push({q,options:[a,b,c,d],answer:ans});
+    await set(ref(db,`tests/${testId}/questions`),questions);
+    closeModal();loadTestQuestions();toast('Question added','success');
+};
+
+window.deleteQuestion=async(testId,index)=>{
+    if(!confirm('Delete this question?'))return;
+    const snap=await get(ref(db,`tests/${testId}/questions`));
+    const questions=snap.val();questions.splice(index,1);
+    await set(ref(db,`tests/${testId}/questions`),questions);
+    loadTestQuestions();toast('Question deleted','success');
+};
+
+$('modal').onclick=e=>{if(e.target===$('modal'))closeModal();};
+
+initApp();
+</script>
+</body>
+</html>
