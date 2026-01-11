@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ofuje - Multiplayer CBT</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<style>
+:root{--bg:#f0f4f8;--card:#fff;--text:#1a202c;--primary:#6366f1;--secondary:#8b5cf6;--accent:#06b6d4;--success:#10b981;--danger:#ef4444;--border:#e2e8f0;--shadow:0 4px 20px rgba(0,0,0,0.08)}
+[data-theme="dark"]{--bg:#0f172a;--card:#1e293b;--text:#f1f5f9;--border:#334155;--shadow:0 4px 20px rgba(0,0,0,0.3)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;transition:all .3s}
+.hidden{display:none!important}
+.container{max-width:1200px;margin:0 auto;padding:20px}
+.card{background:var(--card);border-radius:16px;padding:24px;box-shadow:var(--shadow);border:1px solid var(--border)}
+.btn{padding:12px 24px;border:none;border-radius:10px;cursor:pointer;font-weight:600;transition:all .3s;display:inline-flex;align-items:center;gap:8px}
+.btn-primary{background:linear-gradient(135deg,var(--primary),var(--secondary));color:#fff}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(99,102,241,0.4)}
+.btn-danger{background:var(--danger);color:#fff}
+.btn-success{background:var(--success);color:#fff}
+.btn-outline{background:transparent;border:2px solid var(--primary);color:var(--primary)}
+input,select{width:100%;padding:14px;border:2px solid var(--border);border-radius:10px;background:var(--card);color:var(--text);font-size:16px;transition:all .3s}
+input:focus,select:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 4px rgba(99,102,241,0.1)}
+.logo{font-size:2.5rem;font-weight:700;background:linear-gradient(135deg,var(--primary),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.auth-container{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.auth-card{width:100%;max-width:420px}
+.auth-card h2{text-align:center;margin-bottom:24px}
+.form-group{margin-bottom:16px}
+.form-group label{display:block;margin-bottom:8px;font-weight:500}
+.tabs{display:flex;gap:8px;margin-bottom:24px}
+.tab{flex:1;padding:12px;text-align:center;border-radius:10px;cursor:pointer;background:var(--border);transition:all .3s}
+.tab.active{background:linear-gradient(135deg,var(--primary),var(--secondary));color:#fff}
+.dashboard{display:grid;gap:20px}
+.header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px}
+.user-info{display:flex;align-items:center;gap:12px}
+.avatar{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--secondary));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:1.2rem}
+.nav-btns{display:flex;gap:8px;flex-wrap:wrap}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}
+.stat-card{text-align:center;padding:20px}
+.stat-card i{font-size:2rem;margin-bottom:12px;color:var(--primary)}
+.stat-card h3{font-size:2rem;margin-bottom:4px}
+.stat-card p{color:#64748b;font-size:.9rem}
+.test-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+.test-card{position:relative;overflow:hidden}
+.test-card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--primary),var(--accent))}
+.test-card h3{margin-bottom:8px}
+.test-card p{color:#64748b;margin-bottom:16px}
+.leaderboard-list{max-height:400px;overflow-y:auto}
+.leaderboard-item{display:flex;align-items:center;gap:12px;padding:12px;border-radius:10px;margin-bottom:8px;background:var(--bg);transition:all .3s}
+.leaderboard-item:hover{transform:translateX(4px)}
+.leaderboard-item.gold{background:linear-gradient(135deg,#fef3c7,#fcd34d20)}
+.leaderboard-item.silver{background:linear-gradient(135deg,#f1f5f9,#94a3b820)}
+.leaderboard-item.bronze{background:linear-gradient(135deg,#fed7aa,#fb923c20)}
+.rank{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;background:var(--card)}
+.quiz-arena{min-height:100vh;padding:20px}
+.quiz-header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;margin-bottom:24px}
+.timer{font-size:1.5rem;font-weight:700;color:var(--danger)}
+.players-status{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px}
+.player-card{padding:16px;text-align:center}
+.player-card.current{border:2px solid var(--primary)}
+.question-card{margin-bottom:24px}
+.question-card h3{margin-bottom:16px;font-size:1.2rem}
+.options{display:grid;gap:12px}
+.option{padding:16px;border:2px solid var(--border);border-radius:10px;cursor:pointer;transition:all .3s;display:flex;align-items:center;gap:12px}
+.option:hover{border-color:var(--primary);background:rgba(99,102,241,0.05)}
+.option.selected{border-color:var(--primary);background:rgba(99,102,241,0.1)}
+.option-letter{width:32px;height:32px;border-radius:50%;background:var(--border);display:flex;align-items:center;justify-content:center;font-weight:600}
+.option.selected .option-letter{background:var(--primary);color:#fff}
+.quiz-nav{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.comm-panel{position:fixed;bottom:20px;right:20px;z-index:100}
+.comm-toggle{width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--secondary));border:none;color:#fff;font-size:1.5rem;cursor:pointer;box-shadow:var(--shadow)}
+.comm-box{position:absolute;bottom:70px;right:0;width:320px;background:var(--card);border-radius:16px;box-shadow:var(--shadow);overflow:hidden;display:none}
+.comm-box.active{display:block;animation:slideUp .3s}
+@keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.comm-header{padding:16px;background:linear-gradient(135deg,var(--primary),var(--secondary));color:#fff;display:flex;justify-content:space-between}
+.voice-controls{display:flex;gap:8px;padding:12px;border-bottom:1px solid var(--border)}
+.voice-controls button{flex:1;padding:10px;border:none;border-radius:8px;cursor:pointer;background:var(--bg)}
+.voice-controls button.active{background:var(--success);color:#fff}
+.voice-controls button.muted{background:var(--danger);color:#fff}
+.messages{height:200px;overflow-y:auto;padding:12px}
+.message{margin-bottom:12px;padding:8px 12px;border-radius:10px;max-width:80%}
+.message.sent{background:var(--primary);color:#fff;margin-left:auto}
+.message.received{background:var(--bg)}
+.chat-input{display:flex;gap:8px;padding:12px;border-top:1px solid var(--border)}
+.chat-input input{flex:1}
+.emoji-picker{position:relative}
+.emoji-list{position:absolute;bottom:100%;right:0;background:var(--card);border-radius:10px;padding:8px;box-shadow:var(--shadow);display:none;flex-wrap:wrap;width:200px}
+.emoji-list.active{display:flex}
+.emoji-list span{padding:4px;cursor:pointer;font-size:1.2rem}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:1000;padding:20px}
+.modal-content{background:var(--card);border-radius:16px;padding:24px;max-width:500px;width:100%;max-height:90vh;overflow-y:auto}
+.modal-content h2{margin-bottom:16px}
+.toast-container{position:fixed;top:20px;right:20px;z-index:2000}
+.toast{padding:16px 24px;border-radius:10px;margin-bottom:8px;color:#fff;display:flex;align-items:center;gap:12px;animation:slideIn .3s}
+@keyframes slideIn{from{opacity:0;transform:translateX(100px)}to{opacity:1;transform:translateX(0)}}
+.toast.success{background:var(--success)}
+.toast.error{background:var(--danger)}
+.toast.info{background:var(--primary)}
+.results-card{text-align:center;padding:32px}
+.results-card h2{font-size:2rem;margin-bottom:24px}
+.score-display{font-size:4rem;font-weight:700;background:linear-gradient(135deg,var(--primary),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.results-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:24px}
+.result-item h4{color:#64748b;font-size:.9rem;margin-bottom:4px}
+.result-item p{font-size:1.5rem;font-weight:600}
+.admin-tabs{display:flex;gap:8px;margin-bottom:24px;flex-wrap:wrap}
+.admin-tab{padding:10px 20px;border-radius:8px;cursor:pointer;background:var(--bg);transition:all .3s}
+.admin-tab.active{background:var(--primary);color:#fff}
+.admin-table{width:100%;border-collapse:collapse}
+.admin-table th,.admin-table td{padding:12px;text-align:left;border-bottom:1px solid var(--border)}
+.admin-table th{background:var(--bg);font-weight:600}
+.admin-table tr:hover{background:var(--bg)}
+.waiting-room{text-align:center;padding:40px}
+.waiting-room .spinner{width:60px;height:60px;border:4px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 24px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.progress-bar{height:8px;background:var(--border);border-radius:4px;overflow:hidden;margin-top:16px}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--primary),var(--accent));transition:width .3s}
+@media(max-width:768px){.header{flex-direction:column;text-align:center}.nav-btns{justify-content:center}.players-status{grid-template-columns:1fr}.comm-box{width:280px;right:-10px}}
+</style>
+</head>
+<body>
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- Auth Section -->
+<div id="authSection" class="auth-container">
+<div class="card auth-card">
+<div class="logo" style="text-align:center;margin-bottom:24px">Ofuje</div>
+<div class="tabs">
+<div class="tab active" onclick="switchTab('login')">Login</div>
+<div class="tab" onclick="switchTab('register')">Register</div>
+</div>
+<div id="loginForm">
+<div class="form-group"><label>Access Code</label><input type="text" id="loginCode" placeholder="Enter your access code"></div>
+<button class="btn btn-primary" style="width:100%" onclick="login()"><i class="fas fa-sign-in-alt"></i>Login</button>
+<p style="text-align:center;margin-top:16px;color:#64748b"><small>Admin? <a href="#" onclick="showAdminLogin()" style="color:var(--primary)">Login here</a></small></p>
+</div>
+<div id="registerForm" class="hidden">
+<div class="form-group"><label>Full Name</label><input type="text" id="regName" placeholder="Enter your name"></div>
+<div class="form-group"><label>School</label><input type="text" id="regSchool" placeholder="Enter your school"></div>
+<div class="form-group"><label>Preferred Access Code</label><input type="text" id="regCode" placeholder="Create unique code"></div>
+<button class="btn btn-primary" style="width:100%" onclick="register()"><i class="fas fa-user-plus"></i>Register</button>
+</div>
+</div>
+</div>
+
+<!-- Dashboard -->
+<div id="dashboard" class="hidden container dashboard">
+<div class="card header">
+<div class="user-info">
+<div class="avatar" id="userAvatar">U</div>
+<div><h3 id="userName">User</h3><p style="color:#64748b" id="userSchool">School</p></div>
+</div>
+<div class="nav-btns">
+<button class="btn btn-outline" onclick="toggleTheme()"><i class="fas fa-moon"></i></button>
+<button class="btn btn-outline" onclick="showSettings()"><i class="fas fa-cog"></i></button>
+<button class="btn btn-danger" onclick="logout()"><i class="fas fa-sign-out-alt"></i></button>
+</div>
+</div>
+<div class="stats-grid">
+<div class="card stat-card"><i class="fas fa-trophy"></i><h3 id="userPoints">0</h3><p>Total Points</p></div>
+<div class="card stat-card"><i class="fas fa-chart-line"></i><h3 id="userRank">#1</h3><p>Current Rank</p></div>
+<div class="card stat-card"><i class="fas fa-gamepad"></i><h3 id="userGames">0</h3><p>Games Played</p></div>
+<div class="card stat-card"><i class="fas fa-percent"></i><h3 id="userWinRate">0%</h3><p>Win Rate</p></div>
+</div>
+<div class="card"><h2 style="margin-bottom:16px"><i class="fas fa-book"></i> Available Tests</h2>
+<div class="test-grid" id="testGrid"></div>
+</div>
+<div class="card"><h2 style="margin-bottom:16px"><i class="fas fa-medal"></i> Leaderboard</h2>
+<div class="leaderboard-list" id="leaderboard"></div>
+</div>
+<div class="card"><h2 style="margin-bottom:16px"><i class="fas fa-history"></i> Past Records</h2>
+<div id="pastRecords"><p style="color:#64748b">No records yet</p></div>
+</div>
+</div>
+
+<!-- Quiz Arena -->
+<div id="quizArena" class="hidden quiz-arena">
+<div class="card quiz-header">
+<div><h2 id="quizTitle">Test</h2><p style="color:#64748b">Question <span id="currentQ">1</span>/<span id="totalQ">2</span></p></div>
+<div class="timer"><i class="fas fa-clock"></i> <span id="timer">60:00</span></div>
+</div>
+<div class="players-status">
+<div class="card player-card current"><div class="avatar" style="margin:0 auto 8px" id="p1Avatar">U</div><h4 id="p1Name">You</h4><p style="color:#64748b">Q<span id="p1Q">1</span></p></div>
+<div class="card player-card"><div class="avatar" style="margin:0 auto 8px" id="p2Avatar">O</div><h4 id="p2Name">Opponent</h4><p style="color:#64748b">Q<span id="p2Q">1</span></p></div>
+</div>
+<div class="card question-card"><h3 id="questionText">Loading...</h3>
+<div class="options" id="optionsContainer"></div>
+</div>
+<div class="quiz-nav">
+<button class="btn btn-outline" id="prevBtn" onclick="prevQuestion()"><i class="fas fa-arrow-left"></i> Previous</button>
+<button class="btn btn-outline" id="nextBtn" onclick="nextQuestion()">Next <i class="fas fa-arrow-right"></i></button>
+<button class="btn btn-success" onclick="submitQuiz()"><i class="fas fa-check"></i> Submit</button>
+</div>
+<div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+</div>
+
+<!-- Waiting Room -->
+<div id="waitingRoom" class="hidden container">
+<div class="card waiting-room">
+<div class="spinner"></div>
+<h2>Waiting for Opponent</h2>
+<p style="color:#64748b;margin-top:8px">Looking for another player...</p>
+<button class="btn btn-danger" style="margin-top:24px" onclick="cancelWaiting()">Cancel</button>
+</div>
+</div>
+
+<!-- Results Modal -->
+<div id="resultsModal" class="modal hidden">
+<div class="card modal-content results-card">
+<h2>🎉 Quiz Complete!</h2>
+<div class="score-display" id="finalScore">0/2</div>
+<div class="results-grid">
+<div class="result-item"><h4>Your Score</h4><p id="yourScore">0</p></div>
+<div class="result-item"><h4>Opponent Score</h4><p id="oppScore">0</p></div>
+<div class="result-item"><h4>Point Change</h4><p id="pointChange">+0</p></div>
+<div class="result-item"><h4>New Total</h4><p id="newTotal">0</p></div>
+</div>
+<button class="btn btn-primary" style="margin-top:24px" onclick="closeResults()">Back to Dashboard</button>
+</div>
+</div>
+
+<!-- Test Code Modal -->
+<div id="testCodeModal" class="modal hidden">
+<div class="card modal-content">
+<h2><i class="fas fa-key"></i> Enter Test Code</h2>
+<p style="color:#64748b;margin-bottom:16px">Enter the 6-digit code to access this test</p>
+<div class="form-group"><input type="text" id="testCodeInput" maxlength="6" placeholder="ABC123"></div>
+<div style="display:flex;gap:12px">
+<button class="btn btn-outline" onclick="closeTestCode()">Cancel</button>
+<button class="btn btn-primary" onclick="verifyTestCode()">Start Test</button>
+</div>
+</div>
+</div>
+
+<!-- Settings Modal -->
+<div id="settingsModal" class="modal hidden">
+<div class="card modal-content">
+<h2><i class="fas fa-cog"></i> Settings</h2>
+<div class="form-group"><label>Name</label><input type="text" id="settingsName"></div>
+<div class="form-group"><label>Access Code</label><input type="text" id="settingsCode"></div>
+<div style="display:flex;gap:12px;flex-wrap:wrap">
+<button class="btn btn-primary" onclick="saveSettings()">Save Changes</button>
+<button class="btn btn-danger" onclick="deleteAccount()">Delete Account</button>
+<button class="btn btn-outline" onclick="closeSettings()">Cancel</button>
+</div>
+</div>
+</div>
+
+<!-- Admin Panel -->
+<div id="adminPanel" class="hidden container dashboard">
+<div class="card header">
+<div><h2 class="logo">Ofuje Admin</h2></div>
+<button class="btn btn-danger" onclick="adminLogout()"><i class="fas fa-sign-out-alt"></i>Logout</button>
+</div>
+<div class="admin-tabs">
+<div class="admin-tab active" onclick="switchAdminTab('users')">Users</div>
+<div class="admin-tab" onclick="switchAdminTab('tests')">Tests</div>
+<div class="admin-tab" onclick="switchAdminTab('questions')">Questions</div>
+</div>
+<div class="card" id="adminContent"></div>
+</div>
+
+<!-- Admin Login Modal -->
+<div id="adminLoginModal" class="modal hidden">
+<div class="card modal-content">
+<h2>Admin Login</h2>
+<div class="form-group"><label>Admin Password</label><input type="password" id="adminPass" placeholder="Enter password"></div>
+<div style="display:flex;gap:12px">
+<button class="btn btn-outline" onclick="closeAdminLogin()">Cancel</button>
+<button class="btn btn-primary" onclick="adminLogin()">Login</button>
+</div>
+</div>
+</div>
+
+<!-- Communication Panel -->
+<div class="comm-panel hidden" id="commPanel">
+<div class="comm-box" id="commBox">
+<div class="comm-header"><span><i class="fas fa-comments"></i> Chat</span><button onclick="toggleComm()" style="background:none;border:none;color:#fff;cursor:pointer"><i class="fas fa-times"></i></button></div>
+<div class="voice-controls">
+<button id="micBtn" onclick="toggleMic()"><i class="fas fa-microphone"></i> Mic</button>
+<button id="speakerBtn" onclick="toggleSpeaker()"><i class="fas fa-volume-up"></i> Speaker</button>
+</div>
+<div class="messages" id="messages"></div>
+<div class="chat-input">
+<input type="text" id="chatInput" placeholder="Type message..." onkeypress="if(event.key==='Enter')sendMessage()">
+<div class="emoji-picker">
+<button class="btn btn-outline" style="padding:10px" onclick="toggleEmoji()">😊</button>
+<div class="emoji-list" id="emojiList"></div>
+</div>
+<button class="btn btn-primary" style="padding:10px" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
+</div>
+</div>
+<button class="comm-toggle" onclick="toggleComm()"><i class="fas fa-comments"></i></button>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<script>
+const firebaseConfig={apiKey: "AIzaSyDofEQ2jiMIXji7y-fGopDQcLY8dhixGk4",
+  authDomain: "danz-66ffa.firebaseapp.com",
+  projectId: "danz-66ffa",
+  storageBucket: "danz-66ffa.firebasestorage.app",
+  messagingSenderId: "570041531960",
+  appId: "1:570041531960:web:24b77baa80aba9636c30cd"};
+firebase.initializeApp(firebaseConfig);const db=firebase.database();
+let currentUser=null,currentTest=null,currentRoom=null,timerInterval=null,answers={},micEnabled=false,speakerEnabled=true;
+const emojis=['😊','😂','🎉','👍','❤️','🔥','😎','🤔','😅','👏','💪','🙌','😭','🥳','✨'];
+const defaultTests=[{id:'testA',name:'Mathematics Quiz',code:'MATH01',questions:[{q:'What is 15 + 27?',opts:['42','40','45','38'],ans:0},{q:'What is 12 × 8?',opts:['86','96','106','88'],ans:1}]},{id:'testB',name:'Science Quiz',code:'SCI001',questions:[{q:'What planet is known as the Red Planet?',opts:['Venus','Mars','Jupiter','Saturn'],ans:1},{q:'What is H2O?',opts:['Oxygen','Hydrogen','Water','Carbon'],ans:2}]}];
+
+function toast(msg,type='info'){const t=document.createElement('div');t.className=`toast ${type}`;t.innerHTML=`<i class="fas fa-${type==='success'?'check-circle':type==='error'?'exclamation-circle':'info-circle'}"></i>${msg}`;document.getElementById('toastContainer').appendChild(t);setTimeout(()=>t.remove(),3000)}
+function switchTab(tab){document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',i===(tab==='login'?0:1)));document.getElementById('loginForm').classList.toggle('hidden',tab!=='login');document.getElementById('registerForm').classList.toggle('hidden',tab==='login')}
+function initDB(){db.ref('tests').once('value',s=>{if(!s.exists())defaultTests.forEach(t=>db.ref('tests/'+t.id).set(t))})}
+async function register(){const name=document.getElementById('regName').value.trim(),school=document.getElementById('regSchool').value.trim(),code=document.getElementById('regCode').value.trim();if(!name||!school||!code)return toast('Fill all fields','error');const snap=await db.ref('users').orderByChild('code').equalTo(code).once('value');if(snap.exists())return toast('Code already taken','error');const user={name,school,code,points:0,wins:0,losses:0,games:0,createdAt:Date.now()};await db.ref('users/'+code).set(user);toast('Registration successful!','success');switchTab('login')}
+async function login(){const code=document.getElementById('loginCode').value.trim();if(!code)return toast('Enter access code','error');const snap=await db.ref('users/'+code).once('value');if(!snap.exists())return toast('Invalid access code','error');if(snap.val().restricted)return toast('Account restricted','error');currentUser={...snap.val(),code};localStorage.setItem('ofujeUser',code);showDashboard()}
+function logout(){currentUser=null;localStorage.removeItem('ofujeUser');document.getElementById('dashboard').classList.add('hidden');document.getElementById('authSection').classList.remove('hidden')}
+function showDashboard(){document.getElementById('authSection').classList.add('hidden');document.getElementById('dashboard').classList.remove('hidden');document.getElementById('userName').textContent=currentUser.name;document.getElementById('userSchool').textContent=currentUser.school;document.getElementById('userAvatar').textContent=currentUser.name[0].toUpperCase();document.getElementById('userPoints').textContent=currentUser.points||0;document.getElementById('userGames').textContent=currentUser.games||0;document.getElementById('userWinRate').textContent=currentUser.games?Math.round((currentUser.wins/currentUser.games)*100)+'%':'0%';loadTests();loadLeaderboard();loadRecords();updateRank()}
+function loadTests(){db.ref('tests').on('value',s=>{const tests=s.val()||{};let html='';Object.values(tests).forEach(t=>{html+=`<div class="card test-card"><h3>${t.name}</h3><p>${t.questions?.length||0} Questions</p><button class="btn btn-primary" onclick="selectTest('${t.id}')"><i class="fas fa-play"></i> Start</button></div>`});document.getElementById('testGrid').innerHTML=html||'<p>No tests available</p>'})}
+function loadLeaderboard(){db.ref('users').orderByChild('points').on('value',s=>{const users=[];s.forEach(c=>users.unshift(c.val()));let html='';users.forEach((u,i)=>{const cls=i===0?'gold':i===1?'silver':i===2?'bronze':'';html+=`<div class="leaderboard-item ${cls}"><div class="rank">${i+1}</div><div class="avatar" style="width:36px;height:36px;font-size:.9rem">${u.name[0]}</div><div style="flex:1"><strong>${u.name}</strong><p style="color:#64748b;font-size:.8rem">${u.school}</p></div><div style="font-weight:600;color:var(--primary)">${u.points||0} pts</div></div>`});document.getElementById('leaderboard').innerHTML=html})}
+function updateRank(){db.ref('users').orderByChild('points').once('value',s=>{let rank=1;const users=[];s.forEach(c=>users.unshift(c.val()));users.forEach((u,i)=>{if(u.code===currentUser.code)rank=i+1});document.getElementById('userRank').textContent='#'+rank})}
+function loadRecords(){db.ref('records/'+currentUser.code).limitToLast(10).on('value',s=>{const records=[];s.forEach(c=>records.unshift(c.val()));let html='';records.forEach(r=>{const won=r.result==='win';html+=`<div style="display:flex;justify-content:space-between;padding:12px;border-bottom:1px solid var(--border)"><div><strong>${r.testName}</strong><p style="color:#64748b;font-size:.8rem">${new Date(r.date).toLocaleDateString()}</p></div><div style="text-align:right"><span style="color:${won?'var(--success)':'var(--danger)'}">${r.score}/${r.total}</span><p style="font-size:.8rem">${won?'+10':r.points<5?'+0':'-5'} pts</p></div></div>`});document.getElementById('pastRecords').innerHTML=html||'<p style="color:#64748b">No records yet</p>'})}
+function selectTest(id){currentTest=id;document.getElementById('testCodeModal').classList.remove('hidden')}
+function closeTestCode(){document.getElementById('testCodeModal').classList.add('hidden');document.getElementById('testCodeInput').value=''}
+async function verifyTestCode(){const code=document.getElementById('testCodeInput').value.trim().toUpperCase();const snap=await db.ref('tests/'+currentTest).once('value');const test=snap.val();if(!test||test.code!==code)return toast('Invalid test code','error');closeTestCode();joinWaitingRoom(test)}
+async function joinWaitingRoom(test){document.getElementById('dashboard').classList.add('hidden');document.getElementById('waitingRoom').classList.remove('hidden');const roomsSnap=await db.ref('rooms').orderByChild('testId').equalTo(test.id).once('value');let foundRoom=null;roomsSnap.forEach(r=>{if(r.val().status==='waiting'&&r.val().player1!==currentUser.code)foundRoom={id:r.key,...r.val()}});if(foundRoom){currentRoom=foundRoom.id;await db.ref('rooms/'+currentRoom).update({player2:currentUser.code,player2Name:currentUser.name,status:'playing',startTime:Date.now()});startQuiz(test)}else{currentRoom=db.ref('rooms').push().key;await db.ref('rooms/'+currentRoom).set({testId:test.id,testName:test.name,player1:currentUser.code,player1Name:currentUser.name,player1Q:1,player2Q:1,status:'waiting'});db.ref('rooms/'+currentRoom+'/status').on('value',s=>{if(s.val()==='playing')startQuiz(test)})}}
+function cancelWaiting(){db.ref('rooms/'+currentRoom).remove();currentRoom=null;document.getElementById('waitingRoom').classList.add('hidden');document.getElementById('dashboard').classList.remove('hidden')}
+async function startQuiz(test){document.getElementById('waitingRoom').classList.add('hidden');document.getElementById('quizArena').classList.remove('hidden');document.getElementById('commPanel').classList.remove('hidden');document.getElementById('quizTitle').textContent=test.name;document.getElementById('totalQ').textContent=test.questions.length;answers={};currentQ=0;displayQuestion(test.questions);startTimer(3600);listenRoom(test)}
+function displayQuestion(questions){const q=questions[currentQ];document.getElementById('currentQ').textContent=currentQ+1;document.getElementById('questionText').textContent=q.q;let html='';q.opts.forEach((o,i)=>{html+=`<div class="option ${answers[currentQ]===i?'selected':''}" onclick="selectOption(${i})"><div class="option-letter">${String.fromCharCode(65+i)}</div><span>${o}</span></div>`});document.getElementById('optionsContainer').innerHTML=html;document.getElementById('prevBtn').disabled=currentQ===0;document.getElementById('progressFill').style.width=((currentQ+1)/questions.length*100)+'%';const isP1=db.ref('rooms/'+currentRoom+'/player1').once('value').then(s=>s.val()===currentUser.code);isP1.then(p=>db.ref('rooms/'+currentRoom+'/'+(p?'player1Q':'player2Q')).set(currentQ+1))}
+let currentQ=0;
+function selectOption(i){answers[currentQ]=i;document.querySelectorAll('.option').forEach((o,idx)=>o.classList.toggle('selected',idx===i))}
+function nextQuestion(){db.ref('tests/'+currentTest+'/questions').once('value',s=>{const qs=s.val();if(currentQ<qs.length-1){currentQ++;displayQuestion(qs)}})}
+function prevQuestion(){db.ref('tests/'+currentTest+'/questions').once('value',s=>{if(currentQ>0){currentQ--;displayQuestion(s.val())}})}
+function listenRoom(test){db.ref('rooms/'+currentRoom).on('value',s=>{const room=s.val();if(!room)return;const isP1=room.player1===currentUser.code;document.getElementById('p1Name').textContent=isP1?'You':room.player1Name;document.getElementById('p2Name').textContent=isP1?room.player2Name||'Waiting...':'You';document.getElementById('p1Avatar').textContent=(isP1?currentUser.name:room.player1Name||'?')[0];document.getElementById('p2Avatar').textContent=(isP1?room.player2Name||'?':currentUser.name)[0];document.getElementById('p1Q').textContent=room.player1Q;document.getElementById('p2Q').textContent=room.player2Q;if(room.status==='finished'&&!room[`${isP1?'p1':'p2'}Viewed`]){showResults(room,test,isP1)}})}
+function startTimer(secs){let rem=secs;timerInterval=setInterval(()=>{rem--;const m=Math.floor(rem/60),s=rem%60;document.getElementById('timer').textContent=`${m}:${s.toString().padStart(2,'0')}`;if(rem<=0)submitQuiz()},1000)}
+async function submitQuiz(){clearInterval(timerInterval);const snap=await db.ref('tests/'+currentTest).once('value');const test=snap.val();let score=0;test.questions.forEach((q,i)=>{if(answers[i]===q.ans)score++});const roomSnap=await db.ref('rooms/'+currentRoom).once('value');const room=roomSnap.val();const isP1=room.player1===currentUser.code;const myScoreKey=isP1?'p1Score':'p2Score';await db.ref('rooms/'+currentRoom).update({[myScoreKey]:score,status:'finished'})}
+async function showResults(room,test,isP1){const myScore=isP1?room.p1Score:room.p2Score;const oppScore=isP1?room.p2Score:room.p1Score;if(myScore===undefined||oppScore===undefined)return;const won=myScore>oppScore;const tied=myScore===oppScore;let pointChange=won?10:tied?0:(currentUser.points>=5?-5:0);const newPoints=Math.max(0,currentUser.points+pointChange);await db.ref('users/'+currentUser.code).update({points:newPoints,games:firebase.database.ServerValue.increment(1),wins:won?firebase.database.ServerValue.increment(1):currentUser.wins,losses:!won&&!tied?firebase.database.ServerValue.increment(1):currentUser.losses});await db.ref('records/'+currentUser.code).push({testName:test.name,score:myScore,total:test.questions.length,result:won?'win':tied?'tie':'loss',points:currentUser.points,date:Date.now()});await db.ref('rooms/'+currentRoom+'/'+(isP1?'p1Viewed':'p2Viewed')).set(true);document.getElementById('finalScore').textContent=`${myScore}/${test.questions.length}`;document.getElementById('yourScore').textContent=myScore;document.getElementById('oppScore').textContent=oppScore;document.getElementById('pointChange').textContent=(pointChange>=0?'+':'')+pointChange;document.getElementById('pointChange').style.color=pointChange>=0?'var(--success)':'var(--danger)';document.getElementById('newTotal').textContent=newPoints;document.getElementById('resultsModal').classList.remove('hidden');currentUser.points=newPoints}
+function closeResults(){document.getElementById('resultsModal').classList.add('hidden');document.getElementById('quizArena').classList.add('hidden');document.getElementById('commPanel').classList.add('hidden');db.ref('rooms/'+currentRoom).off();currentRoom=null;showDashboard()}
+function toggleTheme(){const theme=document.body.getAttribute('data-theme')==='dark'?'light':'dark';document.body.setAttribute('data-theme',theme);localStorage.setItem('theme',theme)}
+function showSettings(){document.getElementById('settingsName').value=currentUser.name;document.getElementById('settingsCode').value=currentUser.code;document.getElementById('settingsModal').classList.remove('hidden')}
+function closeSettings(){document.getElementById('settingsModal').classList.add('hidden')}
+async function saveSettings(){const newName=document.getElementById('settingsName').value.trim();const newCode=document.getElementById('settingsCode').value.trim();if(!newName||!newCode)return toast('Fill all fields','error');if(newCode!==currentUser.code){const snap=await db.ref('users/'+newCode).once('value');if(snap.exists())return toast('Code already taken','error');await db.ref('users/'+newCode).set({...currentUser,name:newName,code:newCode});await db.ref('users/'+currentUser.code).remove();currentUser.code=newCode;localStorage.setItem('ofujeUser',newCode)}else{await db.ref('users/'+currentUser.code).update({name:newName})}currentUser.name=newName;toast('Settings saved!','success');closeSettings();showDashboard()}
+async function deleteAccount(){if(!confirm('Delete your account permanently?'))return;await db.ref('users/'+currentUser.code).remove();await db.ref('records/'+currentUser.code).remove();toast('Account deleted','success');logout()}
+function toggleComm(){document.getElementById('commBox').classList.toggle('active')}
+function toggleMic(){micEnabled=!micEnabled;document.getElementById('micBtn').classList.toggle('muted',!micEnabled);document.getElementById('micBtn').classList.toggle('active',micEnabled);toast(micEnabled?'Microphone on':'Microphone off')}
+function toggleSpeaker(){speakerEnabled=!speakerEnabled;document.getElementById('speakerBtn').classList.toggle('muted',!speakerEnabled);document.getElementById('speakerBtn').classList.toggle('active',speakerEnabled);toast(speakerEnabled?'Speaker on':'Speaker off')}
+function sendMessage(){const input=document.getElementById('chatInput');const msg=input.value.trim();if(!msg||!currentRoom)return;db.ref('rooms/'+currentRoom+'/messages').push({from:currentUser.code,name:currentUser.name,text:msg,time:Date.now()});input.value=''}
+function listenMessages(){if(!currentRoom)return;db.ref('rooms/'+currentRoom+'/messages').on('child_added',s=>{const m=s.val();const isMine=m.from===currentUser.code;const div=document.createElement('div');div.className=`message ${isMine?'sent':'received'}`;div.textContent=m.text;document.getElementById('messages').appendChild(div);document.getElementById('messages').scrollTop=9999})}
+function toggleEmoji(){document.getElementById('emojiList').classList.toggle('active')}
+function initEmojis(){const list=document.getElementById('emojiList');emojis.forEach(e=>{const span=document.createElement('span');span.textContent=e;span.onclick=()=>{document.getElementById('chatInput').value+=e;toggleEmoji()};list.appendChild(span)})}
+function showAdminLogin(){document.getElementById('adminLoginModal').classList.remove('hidden')}
+function closeAdminLogin(){document.getElementById('adminLoginModal').classList.add('hidden');document.getElementById('adminPass').value=''}
+function adminLogin(){const pass=document.getElementById('adminPass').value;if(pass!=='admin123')return toast('Invalid password','error');closeAdminLogin();document.getElementById('authSection').classList.add('hidden');document.getElementById('adminPanel').classList.remove('hidden');loadAdminUsers()}
+function adminLogout(){document.getElementById('adminPanel').classList.add('hidden');document.getElementById('authSection').classList.remove('hidden')}
+function switchAdminTab(tab){document.querySelectorAll('.admin-tab').forEach(t=>t.classList.remove('active'));event.target.classList.add('active');if(tab==='users')loadAdminUsers();else if(tab==='tests')loadAdminTests();else loadAdminQuestions()}
+function loadAdminUsers(){db.ref('users').on('value',s=>{let html='<table class="admin-table"><tr><th>Name</th><th>Code</th><th>Points</th><th>Actions</th></tr>';const users=s.val()||{};Object.entries(users).forEach(([k,u])=>{html+=`<tr><td>${u.name}</td><td>${u.code}</td><td><input type="number" value="${u.points||0}" style="width:60px" onchange="updatePoints('${k}',this.value)"></td><td><button class="btn btn-danger" style="padding:6px 12px" onclick="adminDeleteUser('${k}')"><i class="fas fa-trash"></i></button><button class="btn btn-outline" style="padding:6px 12px;margin-left:4px" onclick="toggleRestrict('${k}',${!u.restricted})">${u.restricted?'Unrestrict':'Restrict'}</button></td></tr>`});html+='</table>';document.getElementById('adminContent').innerHTML=html})}
+function updatePoints(code,pts){db.ref('users/'+code+'/points').set(parseInt(pts));toast('Points updated','success')}
+function adminDeleteUser(code){if(!confirm('Delete this user?'))return;db.ref('users/'+code).remove();db.ref('records/'+code).remove();toast('User deleted','success')}
+function toggleRestrict(code,val){db.ref('users/'+code+'/restricted').set(val);toast(val?'User restricted':'User unrestricted','success')}
+function loadAdminTests(){db.ref('tests').on('value',s=>{let html=`<button class="btn btn-primary" style="margin-bottom:16px" onclick="showAddTest()"><i class="fas fa-plus"></i> Add Test</button><table class="admin-table"><tr><th>Name</th><th>Code</th><th>Questions</th><th>Actions</th></tr>`;const tests=s.val()||{};Object.entries(tests).forEach(([k,t])=>{html+=`<tr><td>${t.name}</td><td>${t.code}</td><td>${t.questions?.length||0}</td><td><button class="btn btn-danger" style="padding:6px 12px" onclick="deleteTest('${k}')"><i class="fas fa-trash"></i></button></td></tr>`});html+='</table>';document.getElementById('adminContent').innerHTML=html})}
+function showAddTest(){const name=prompt('Test name:');const code=prompt('Test code (6 chars):');if(name&&code){const id='test_'+Date.now();db.ref('tests/'+id).set({id,name,code:code.toUpperCase(),questions:[]});toast('Test added','success')}}
+function deleteTest(id){if(!confirm('Delete this test?'))return;db.ref('tests/'+id).remove();toast('Test deleted','success')}
+function loadAdminQuestions(){db.ref('tests').once('value',s=>{const tests=s.val()||{};let html='<select id="adminTestSelect" onchange="loadTestQuestions(this.value)" style="margin-bottom:16px">';Object.entries(tests).forEach(([k,t])=>html+=`<option value="${k}">${t.name}</option>`);html+='</select><div id="questionsContent"></div>';document.getElementById('adminContent').innerHTML=html;const firstId=Object.keys(tests)[0];if(firstId)loadTestQuestions(firstId)})}
+function loadTestQuestions(testId){db.ref('tests/'+testId+'/questions').on('value',s=>{let html=`<button class="btn btn-primary" style="margin-bottom:16px" onclick="addQuestion('${testId}')"><i class="fas fa-plus"></i> Add Question</button>`;const qs=s.val()||[];qs.forEach((q,i)=>{html+=`<div class="card" style="margin-bottom:8px"><p><strong>Q${i+1}:</strong> ${q.q}</p><p style="color:#64748b">Answer: ${String.fromCharCode(65+q.ans)}</p><button class="btn btn-danger" style="padding:4px 8px" onclick="deleteQuestion('${testId}',${i})"><i class="fas fa-trash"></i></button></div>`});document.getElementById('questionsContent').innerHTML=html})}
+function addQuestion(testId){const q=prompt('Question:');const opts=prompt('Options (comma separated):');const ans=parseInt(prompt('Correct answer index (0-3):'));if(q&&opts){const question={q,opts:opts.split(',').map(o=>o.trim()),ans};db.ref('tests/'+testId+'/questions').once('value',s=>{const qs=s.val()||[];qs.push(question);db.ref('tests/'+testId+'/questions').set(qs)});toast('Question added','success')}}
+function deleteQuestion(testId,idx){db.ref('tests/'+testId+'/questions').once('value',s=>{const qs=s.val()||[];qs.splice(idx,1);db.ref('tests/'+testId+'/questions').set(qs)});toast('Question deleted','success')}
+document.addEventListener('DOMContentLoaded',()=>{initDB();initEmojis();const theme=localStorage.getItem('theme');if(theme)document.body.setAttribute('data-theme',theme);const savedUser=localStorage.getItem('ofujeUser');if(savedUser){db.ref('users/'+savedUser).once('value',s=>{if(s.exists()){currentUser={...s.val(),code:savedUser};showDashboard()}})}});
+</script>
+</body>
+</html>
