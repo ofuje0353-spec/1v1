@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>BookVault - Share & Discover Books</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif}
+:root{--primary:#6366f1;--secondary:#8b5cf6;--accent:#ec4899;--dark:#1e1b4b;--light:#f8fafc;--success:#10b981;--warning:#f59e0b;--danger:#ef4444;--glass:rgba(255,255,255,0.1);--shadow:0 25px 50px -12px rgba(0,0,0,0.25)}
+body{background:linear-gradient(135deg,#1e1b4b 0%,#312e81 50%,#4c1d95 100%);min-height:100vh;color:#fff}
+.container{max-width:1400px;margin:0 auto;padding:20px}
+.hidden{display:none!important}
+.btn{padding:12px 24px;border:none;border-radius:12px;cursor:pointer;font-weight:600;transition:all .3s;display:inline-flex;align-items:center;gap:8px}
+.btn-primary{background:linear-gradient(135deg,var(--primary),var(--secondary));color:#fff}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 10px 40px rgba(99,102,241,0.4)}
+.btn-danger{background:var(--danger);color:#fff}
+.btn-success{background:var(--success);color:#fff}
+.btn-warning{background:var(--warning);color:#fff}
+.btn-ghost{background:var(--glass);color:#fff;backdrop-filter:blur(10px)}
+.input-group{margin-bottom:20px}
+.input-group label{display:block;margin-bottom:8px;font-weight:500;color:rgba(255,255,255,0.8)}
+.input-group input,.input-group textarea,.input-group select{width:100%;padding:14px 18px;border:2px solid rgba(255,255,255,0.1);border-radius:12px;background:var(--glass);color:#fff;font-size:16px;backdrop-filter:blur(10px);transition:all .3s}
+.input-group input:focus,.input-group textarea:focus,.input-group select:focus{outline:none;border-color:var(--primary);box-shadow:0 0 30px rgba(99,102,241,0.3)}
+.input-group input::placeholder{color:rgba(255,255,255,0.5)}
+.card{background:var(--glass);backdrop-filter:blur(20px);border-radius:24px;padding:30px;border:1px solid rgba(255,255,255,0.1);box-shadow:var(--shadow)}
+.auth-container{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.auth-box{width:100%;max-width:450px}
+.auth-box h1{text-align:center;margin-bottom:10px;font-size:2.5rem;background:linear-gradient(135deg,#fff,var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.auth-box p{text-align:center;color:rgba(255,255,255,0.7);margin-bottom:30px}
+.auth-box .btn{width:100%;justify-content:center;padding:16px}
+.auth-toggle{text-align:center;margin-top:20px;color:rgba(255,255,255,0.7)}
+.auth-toggle a{color:var(--accent);text-decoration:none;font-weight:600}
+.logo{display:flex;align-items:center;gap:10px;font-size:1.5rem;font-weight:700}
+.logo i{font-size:2rem;color:var(--accent)}
+.nav{display:flex;justify-content:space-between;align-items:center;padding:20px 0;margin-bottom:30px;flex-wrap:wrap;gap:20px}
+.nav-links{display:flex;gap:10px;flex-wrap:wrap}
+.nav-links .btn{padding:10px 20px}
+.user-info{display:flex;align-items:center;gap:15px}
+.user-avatar{width:45px;height:45px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--accent));display:flex;align-items:center;justify-content:center;font-weight:700}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px;margin-bottom:40px}
+.stat-card{background:linear-gradient(135deg,var(--glass),rgba(255,255,255,0.05));backdrop-filter:blur(20px);border-radius:20px;padding:25px;border:1px solid rgba(255,255,255,0.1);transition:all .3s}
+.stat-card:hover{transform:translateY(-5px);box-shadow:0 20px 40px rgba(0,0,0,0.3)}
+.stat-card i{font-size:2.5rem;margin-bottom:15px}
+.stat-card.purple i{color:#a78bfa}
+.stat-card.pink i{color:#f472b6}
+.stat-card.blue i{color:#60a5fa}
+.stat-card.green i{color:#34d399}
+.stat-card h3{font-size:2rem;margin-bottom:5px}
+.stat-card p{color:rgba(255,255,255,0.6)}
+.section-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:25px;flex-wrap:wrap;gap:15px}
+.section-header h2{font-size:1.8rem;display:flex;align-items:center;gap:10px}
+.search-box{display:flex;gap:10px;flex:1;max-width:500px}
+.search-box input{flex:1;padding:12px 20px;border:2px solid rgba(255,255,255,0.1);border-radius:12px;background:var(--glass);color:#fff;backdrop-filter:blur(10px)}
+.search-box input:focus{outline:none;border-color:var(--primary)}
+.books-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:25px}
+.book-card{background:var(--glass);backdrop-filter:blur(20px);border-radius:20px;overflow:hidden;border:1px solid rgba(255,255,255,0.1);transition:all .3s}
+.book-card:hover{transform:translateY(-10px);box-shadow:0 30px 60px rgba(0,0,0,0.3)}
+.book-image{width:100%;height:200px;object-fit:cover;background:linear-gradient(135deg,var(--primary),var(--secondary))}
+.book-content{padding:20px}
+.book-title{font-size:1.2rem;font-weight:600;margin-bottom:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.book-meta{display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+.book-tag{padding:4px 12px;background:rgba(99,102,241,0.3);border-radius:20px;font-size:0.75rem;color:#c7d2fe}
+.book-desc{color:rgba(255,255,255,0.7);font-size:0.9rem;margin-bottom:15px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.book-actions{display:flex;gap:10px;flex-wrap:wrap}
+.book-actions .btn{padding:8px 16px;font-size:0.85rem}
+.book-stats{display:flex;gap:20px;margin-bottom:15px;color:rgba(255,255,255,0.7);font-size:0.9rem}
+.book-stats span{display:flex;align-items:center;gap:5px}
+.modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);display:flex;align-items:center;justify-content:center;z-index:1000;padding:20px;backdrop-filter:blur(5px)}
+.modal-content{background:linear-gradient(135deg,#1e1b4b,#312e81);border-radius:24px;padding:30px;max-width:600px;width:100%;max-height:90vh;overflow-y:auto;border:1px solid rgba(255,255,255,0.1)}
+.modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:25px}
+.modal-header h2{font-size:1.5rem}
+.close-btn{background:none;border:none;color:#fff;font-size:1.5rem;cursor:pointer}
+.comments-section{margin-top:20px;max-height:300px;overflow-y:auto}
+.comment{background:rgba(255,255,255,0.05);border-radius:12px;padding:15px;margin-bottom:10px}
+.comment-header{display:flex;justify-content:space-between;margin-bottom:8px}
+.comment-user{font-weight:600;color:var(--accent)}
+.comment-date{font-size:0.8rem;color:rgba(255,255,255,0.5)}
+.comment-text{color:rgba(255,255,255,0.8)}
+.tabs{display:flex;gap:10px;margin-bottom:25px;flex-wrap:wrap}
+.tab{padding:12px 24px;background:var(--glass);border:none;color:#fff;border-radius:12px;cursor:pointer;transition:all .3s;font-weight:500}
+.tab.active{background:linear-gradient(135deg,var(--primary),var(--secondary))}
+.settings-section{display:grid;gap:20px}
+.admin-table{width:100%;border-collapse:collapse;margin-top:20px}
+.admin-table th,.admin-table td{padding:15px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.1)}
+.admin-table th{background:rgba(255,255,255,0.05);font-weight:600}
+.admin-table tr:hover{background:rgba(255,255,255,0.03)}
+.status-badge{padding:5px 12px;border-radius:20px;font-size:0.8rem;font-weight:500}
+.status-active{background:rgba(16,185,129,0.2);color:#34d399}
+.status-restricted{background:rgba(239,68,68,0.2);color:#f87171}
+.file-upload{border:2px dashed rgba(255,255,255,0.2);border-radius:16px;padding:40px;text-align:center;cursor:pointer;transition:all .3s}
+.file-upload:hover{border-color:var(--primary);background:rgba(99,102,241,0.1)}
+.file-upload i{font-size:3rem;color:var(--primary);margin-bottom:15px}
+.file-upload p{color:rgba(255,255,255,0.6)}
+.toast{position:fixed;bottom:30px;right:30px;padding:15px 25px;border-radius:12px;color:#fff;font-weight:500;z-index:2000;animation:slideIn .3s}
+@keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+.toast-success{background:var(--success)}
+.toast-error{background:var(--danger)}
+.toast-info{background:var(--primary)}
+.loading{display:flex;align-items:center;justify-content:center;padding:50px}
+.spinner{width:50px;height:50px;border:4px solid rgba(255,255,255,0.1);border-top-color:var(--primary);border-radius:50%;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.feature-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;margin-top:30px}
+.feature-card{background:linear-gradient(135deg,rgba(99,102,241,0.2),rgba(236,72,153,0.2));backdrop-filter:blur(20px);border-radius:20px;padding:30px;border:1px solid rgba(255,255,255,0.1);text-align:center;transition:all .3s}
+.feature-card:hover{transform:scale(1.02)}
+.feature-card i{font-size:3rem;margin-bottom:20px;background:linear-gradient(135deg,var(--primary),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.feature-card h3{margin-bottom:10px}
+.feature-card p{color:rgba(255,255,255,0.6);font-size:0.9rem}
+.categories-filter{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px}
+.category-btn{padding:8px 18px;background:var(--glass);border:1px solid rgba(255,255,255,0.1);color:#fff;border-radius:20px;cursor:pointer;transition:all .3s;font-size:0.9rem}
+.category-btn.active,.category-btn:hover{background:linear-gradient(135deg,var(--primary),var(--secondary));border-color:transparent}
+.empty-state{text-align:center;padding:60px 20px;color:rgba(255,255,255,0.6)}
+.empty-state i{font-size:4rem;margin-bottom:20px;opacity:0.5}
+@media(max-width:768px){.nav{flex-direction:column;text-align:center}.nav-links{justify-content:center}.search-box{max-width:100%}.books-grid{grid-template-columns:1fr}.modal-content{padding:20px}.admin-table{font-size:0.85rem}.admin-table th,.admin-table td{padding:10px}}
+select option{background:#1e1b4b;color:#fff}
+</style>
+</head>
+<body>
+
+<!-- Auth Section -->
+<div id="authSection" class="auth-container">
+<div class="auth-box card">
+<div class="logo" style="justify-content:center;margin-bottom:20px"><i class="fas fa-book-open"></i>BookVault</div>
+<div id="loginForm">
+<h1>Welcome Back</h1>
+<p>Sign in to access your books</p>
+<div class="input-group"><label>Email</label><input type="email" id="loginEmail" placeholder="Enter your email"></div>
+<div class="input-group"><label>Password</label><input type="password" id="loginPassword" placeholder="Enter your password"></div>
+<button class="btn btn-primary" onclick="login()"><i class="fas fa-sign-in-alt"></i>Sign In</button>
+<p class="auth-toggle">Don't have an account? <a href="#" onclick="toggleAuth()">Register</a></p>
+<p class="auth-toggle" style="margin-top:10px"><a href="#" onclick="showAdminLogin()">Admin Access</a></p>
+</div>
+<div id="registerForm" class="hidden">
+<h1>Create Account</h1>
+<p>Join our community of book lovers</p>
+<div class="input-group"><label>Full Name</label><input type="text" id="regName" placeholder="Enter your full name"></div>
+<div class="input-group"><label>Email</label><input type="email" id="regEmail" placeholder="Enter your email"></div>
+<div class="input-group"><label>Password</label><input type="password" id="regPassword" placeholder="Create a password"></div>
+<button class="btn btn-primary" onclick="register()"><i class="fas fa-user-plus"></i>Create Account</button>
+<p class="auth-toggle">Already have an account? <a href="#" onclick="toggleAuth()">Sign In</a></p>
+</div>
+<div id="adminLoginForm" class="hidden">
+<h1>Admin Access</h1>
+<p>Enter admin code to continue</p>
+<div class="input-group"><label>Admin Code</label><input type="password" id="adminCode" placeholder="Enter admin code"></div>
+<button class="btn btn-primary" onclick="adminLogin()"><i class="fas fa-shield-alt"></i>Access Admin Panel</button>
+<p class="auth-toggle"><a href="#" onclick="showUserLogin()">Back to User Login</a></p>
+</div>
+</div>
+</div>
+
+<!-- Main App -->
+<div id="mainApp" class="hidden">
+<div class="container">
+<nav class="nav">
+<div class="logo"><i class="fas fa-book-open"></i>BookVault</div>
+<div class="nav-links">
+<button class="btn btn-ghost" onclick="showSection('dashboard')"><i class="fas fa-home"></i>Dashboard</button>
+<button class="btn btn-ghost" onclick="showSection('library')"><i class="fas fa-books"></i>Library</button>
+<button class="btn btn-ghost" onclick="showSection('upload')"><i class="fas fa-upload"></i>Upload</button>
+<button class="btn btn-ghost" onclick="showSection('mybooks')"><i class="fas fa-book"></i>My Books</button>
+<button class="btn btn-ghost" onclick="showSection('settings')"><i class="fas fa-cog"></i>Settings</button>
+</div>
+<div class="user-info">
+<div class="user-avatar" id="userAvatar">U</div>
+<span id="userName">User</span>
+<button class="btn btn-ghost" onclick="logout()"><i class="fas fa-sign-out-alt"></i></button>
+</div>
+</nav>
+
+<!-- Dashboard Section -->
+<div id="dashboardSection">
+<h1 style="margin-bottom:30px">Welcome to <span style="color:var(--accent)">BookVault</span> 📚</h1>
+<div class="stats-grid">
+<div class="stat-card purple"><i class="fas fa-book"></i><h3 id="totalBooks">0</h3><p>Total Books</p></div>
+<div class="stat-card pink"><i class="fas fa-heart"></i><h3 id="totalLikes">0</h3><p>Total Likes</p></div>
+<div class="stat-card blue"><i class="fas fa-download"></i><h3 id="totalDownloads">0</h3><p>Downloads</p></div>
+<div class="stat-card green"><i class="fas fa-users"></i><h3 id="totalUsers">0</h3><p>Members</p></div>
+</div>
+<h2><i class="fas fa-star"></i> Features</h2>
+<div class="feature-cards">
+<div class="feature-card"><i class="fas fa-cloud-upload-alt"></i><h3>Upload Books</h3><p>Share your favorite books with the community</p></div>
+<div class="feature-card"><i class="fas fa-search"></i><h3>Search & Discover</h3><p>Find books by title, category, or author</p></div>
+<div class="feature-card"><i class="fas fa-download"></i><h3>Easy Downloads</h3><p>Download books instantly to your device</p></div>
+<div class="feature-card"><i class="fas fa-comments"></i><h3>Engage & Connect</h3><p>Like and comment on books you love</p></div>
+</div>
+</div>
+
+<!-- Library Section -->
+<div id="librarySection" class="hidden">
+<div class="section-header">
+<h2><i class="fas fa-books"></i> Book Library</h2>
+<div class="search-box">
+<input type="text" id="searchInput" placeholder="Search books..." oninput="searchBooks()">
+<button class="btn btn-primary" onclick="searchBooks()"><i class="fas fa-search"></i></button>
+</div>
+</div>
+<div class="categories-filter" id="categoriesFilter"></div>
+<div class="books-grid" id="booksGrid"></div>
+</div>
+
+<!-- Upload Section -->
+<div id="uploadSection" class="hidden">
+<div class="card" style="max-width:700px;margin:0 auto">
+<h2 style="margin-bottom:25px"><i class="fas fa-upload"></i> Upload New Book</h2>
+<div class="input-group"><label>Book Title</label><input type="text" id="bookTitle" placeholder="Enter book title"></div>
+<div class="input-group"><label>Class/Grade</label><input type="text" id="bookClass" placeholder="e.g., Grade 10, University"></div>
+<div class="input-group"><label>Category</label>
+<select id="bookCategory">
+<option value="">Select Category</option>
+<option value="Fiction">Fiction</option>
+<option value="Non-Fiction">Non-Fiction</option>
+<option value="Science">Science</option>
+<option value="Mathematics">Mathematics</option>
+<option value="History">History</option>
+<option value="Technology">Technology</option>
+<option value="Arts">Arts</option>
+<option value="Literature">Literature</option>
+<option value="Other">Other</option>
+</select>
+</div>
+<div class="input-group"><label>Short Description</label><textarea id="bookDesc" rows="4" placeholder="Describe this book..."></textarea></div>
+<div class="input-group"><label>Book Cover Image</label>
+<div class="file-upload" onclick="document.getElementById('bookImage').click()">
+<i class="fas fa-image"></i><p id="imageFileName">Click to upload image</p>
+<input type="file" id="bookImage" accept="image/*" style="display:none" onchange="updateFileName(this,'imageFileName')">
+</div>
+</div>
+<div class="input-group"><label>Book File (PDF)</label>
+<div class="file-upload" onclick="document.getElementById('bookFile').click()">
+<i class="fas fa-file-pdf"></i><p id="bookFileName">Click to upload PDF</p>
+<input type="file" id="bookFile" accept=".pdf" style="display:none" onchange="updateFileName(this,'bookFileName')">
+</div>
+</div>
+<button class="btn btn-primary" onclick="uploadBook()" style="width:100%"><i class="fas fa-cloud-upload-alt"></i>Upload Book</button>
+</div>
+</div>
+
+<!-- My Books Section -->
+<div id="mybooksSection" class="hidden">
+<div class="section-header"><h2><i class="fas fa-book"></i> My Uploaded Books</h2></div>
+<div class="books-grid" id="myBooksGrid"></div>
+</div>
+
+<!-- Settings Section -->
+<div id="settingsSection" class="hidden">
+<div class="card" style="max-width:600px;margin:0 auto">
+<h2 style="margin-bottom:25px"><i class="fas fa-cog"></i> Account Settings</h2>
+<div class="tabs">
+<button class="tab active" onclick="showSettingsTab('profile')">Profile</button>
+<button class="tab" onclick="showSettingsTab('security')">Security</button>
+</div>
+<div id="profileTab" class="settings-section">
+<div class="input-group"><label>Full Name</label><input type="text" id="settingsName" placeholder="Your name"></div>
+<div class="input-group"><label>Email</label><input type="email" id="settingsEmail" placeholder="Your email"></div>
+<button class="btn btn-primary" onclick="updateProfile()"><i class="fas fa-save"></i>Save Changes</button>
+</div>
+<div id="securityTab" class="settings-section hidden">
+<div class="input-group"><label>Current Password</label><input type="password" id="currentPassword" placeholder="Current password"></div>
+<div class="input-group"><label>New Password</label><input type="password" id="newPassword" placeholder="New password"></div>
+<div class="input-group"><label>Confirm Password</label><input type="password" id="confirmPassword" placeholder="Confirm new password"></div>
+<button class="btn btn-primary" onclick="updatePassword()"><i class="fas fa-lock"></i>Update Password</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- Admin Panel -->
+<div id="adminPanel" class="hidden">
+<div class="container">
+<nav class="nav">
+<div class="logo"><i class="fas fa-shield-alt"></i>Admin Panel</div>
+<div class="nav-links">
+<button class="btn btn-ghost" onclick="showAdminSection('users')"><i class="fas fa-users"></i>Users</button>
+<button class="btn btn-ghost" onclick="showAdminSection('books')"><i class="fas fa-books"></i>Books</button>
+<button class="btn btn-danger" onclick="logoutAdmin()"><i class="fas fa-sign-out-alt"></i>Exit Admin</button>
+</div>
+</nav>
+
+<div id="adminUsersSection">
+<h2 style="margin-bottom:20px"><i class="fas fa-users"></i> Manage Users</h2>
+<div class="card" style="overflow-x:auto">
+<table class="admin-table">
+<thead><tr><th>Name</th><th>Email</th><th>Status</th><th>Books</th><th>Actions</th></tr></thead>
+<tbody id="usersTableBody"></tbody>
+</table>
+</div>
+</div>
+
+<div id="adminBooksSection" class="hidden">
+<h2 style="margin-bottom:20px"><i class="fas fa-books"></i> Manage Books</h2>
+<div class="search-box" style="max-width:400px;margin-bottom:20px">
+<input type="text" id="adminSearchBooks" placeholder="Search books..." oninput="searchAdminBooks()">
+</div>
+<div class="books-grid" id="adminBooksGrid"></div>
+</div>
+</div>
+</div>
+
+<!-- Book Details Modal -->
+<div id="bookModal" class="modal hidden">
+<div class="modal-content">
+<div class="modal-header">
+<h2 id="modalBookTitle">Book Title</h2>
+<button class="close-btn" onclick="closeModal()"><i class="fas fa-times"></i></button>
+</div>
+<img id="modalBookImage" style="width:100%;height:250px;object-fit:cover;border-radius:12px;margin-bottom:20px">
+<div class="book-meta" id="modalBookMeta"></div>
+<p id="modalBookDesc" style="color:rgba(255,255,255,0.8);margin-bottom:20px"></p>
+<div class="book-stats" id="modalBookStats"></div>
+<div class="book-actions" style="margin-bottom:25px">
+<button class="btn btn-primary" id="likeBtn" onclick="toggleLike()"><i class="fas fa-heart"></i><span id="likeCount">0</span></button>
+<button class="btn btn-success" id="downloadBtn" onclick="downloadBook()"><i class="fas fa-download"></i>Download</button>
+</div>
+<h3 style="margin-bottom:15px"><i class="fas fa-comments"></i> Comments</h3>
+<div class="input-group" style="display:flex;gap:10px">
+<input type="text" id="commentInput" placeholder="Write a comment..." style="flex:1">
+<button class="btn btn-primary" onclick="addComment()"><i class="fas fa-paper-plane"></i></button>
+</div>
+<div class="comments-section" id="commentsSection"></div>
+</div>
+</div>
+
+<!-- Edit Book Modal -->
+<div id="editBookModal" class="modal hidden">
+<div class="modal-content">
+<div class="modal-header">
+<h2>Edit Book</h2>
+<button class="close-btn" onclick="closeEditModal()"><i class="fas fa-times"></i></button>
+</div>
+<div class="input-group"><label>Book Title</label><input type="text" id="editBookTitle"></div>
+<div class="input-group"><label>Class/Grade</label><input type="text" id="editBookClass"></div>
+<div class="input-group"><label>Category</label>
+<select id="editBookCategory">
+<option value="Fiction">Fiction</option>
+<option value="Non-Fiction">Non-Fiction</option>
+<option value="Science">Science</option>
+<option value="Mathematics">Mathematics</option>
+<option value="History">History</option>
+<option value="Technology">Technology</option>
+<option value="Arts">Arts</option>
+<option value="Literature">Literature</option>
+<option value="Other">Other</option>
+</select>
+</div>
+<div class="input-group"><label>Description</label><textarea id="editBookDesc" rows="4"></textarea></div>
+<button class="btn btn-primary" onclick="saveBookEdit()" style="width:100%"><i class="fas fa-save"></i>Save Changes</button>
+</div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+<script>
+// Firebase Config - Replace with your own
+const firebaseConfig={apiKey: "AIzaSyAAsGHg-zpLkWEHnGPr1YqhGdNr-UL9vQg",
+  authDomain: "bookverse-d0c3a.firebaseapp.com",
+  databaseURL: "https://bookverse-d0c3a-default-rtdb.firebaseio.com",
+  projectId: "bookverse-d0c3a",
+  storageBucket: "bookverse-d0c3a.firebasestorage.app",
+  messagingSenderId: "627307294672",
+  appId: "1:627307294672:web:c242d66e7866ba85a593d5"};
+
+firebase.initializeApp(firebaseConfig);
+const auth=firebase.auth(),db=firebase.firestore(),storage=firebase.storage();
+let currentUser=null,currentBook=null,editingBookId=null,isAdmin=false,allBooks=[],allUsers=[];
+
+// Toast notification
+const toast=(msg,type='info')=>{const t=document.createElement('div');t.className=`toast toast-${type}`;t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),3000)};
+
+// Auth functions
+const toggleAuth=()=>{document.getElementById('loginForm').classList.toggle('hidden');document.getElementById('registerForm').classList.toggle('hidden')};
+const showAdminLogin=()=>{document.getElementById('loginForm').classList.add('hidden');document.getElementById('registerForm').classList.add('hidden');document.getElementById('adminLoginForm').classList.remove('hidden')};
+const showUserLogin=()=>{document.getElementById('adminLoginForm').classList.add('hidden');document.getElementById('loginForm').classList.remove('hidden')};
+
+async function register(){
+const name=document.getElementById('regName').value,email=document.getElementById('regEmail').value,password=document.getElementById('regPassword').value;
+if(!name||!email||!password)return toast('Please fill all fields','error');
+try{
+const cred=await auth.createUserWithEmailAndPassword(email,password);
+await db.collection('users').doc(cred.user.uid).set({name,email,createdAt:firebase.firestore.FieldValue.serverTimestamp(),status:'active',downloads:0,uploads:0});
+toast('Account created successfully!','success');
+}catch(e){toast(e.message,'error')}}
+
+async function login(){
+const email=document.getElementById('loginEmail').value,password=document.getElementById('loginPassword').value;
+if(!email||!password)return toast('Please fill all fields','error');
+try{await auth.signInWithEmailAndPassword(email,password);toast('Welcome back!','success')}catch(e){toast(e.message,'error')}}
+
+function adminLogin(){
+const code=document.getElementById('adminCode').value;
+if(code==='OFUJE673'){isAdmin=true;document.getElementById('authSection').classList.add('hidden');document.getElementById('adminPanel').classList.remove('hidden');loadAdminData();toast('Admin access granted','success')}
+else toast('Invalid admin code','error')}
+
+function logout(){auth.signOut();toast('Logged out successfully','info')}
+function logoutAdmin(){isAdmin=false;document.getElementById('adminPanel').classList.add('hidden');document.getElementById('authSection').classList.remove('hidden');showUserLogin()}
+
+// Auth state listener
+auth.onAuthStateChanged(async user=>{
+if(user&&!isAdmin){
+currentUser=user;
+const doc=await db.collection('users').doc(user.uid).get();
+if(doc.exists){
+const data=doc.data();
+if(data.status==='restricted'){toast('Your account is restricted','error');auth.signOut();return}
+document.getElementById('userName').textContent=data.name;
+document.getElementById('userAvatar').textContent=data.name.charAt(0).toUpperCase();
+document.getElementById('settingsName').value=data.name;
+document.getElementById('settingsEmail').value=user.email;
+}
+document.getElementById('authSection').classList.add('hidden');
+document.getElementById('mainApp').classList.remove('hidden');
+loadDashboard();loadBooks();
+}else if(!isAdmin){
+document.getElementById('mainApp').classList.add('hidden');
+document.getElementById('authSection').classList.remove('hidden');
+}});
+
+// Navigation
+function showSection(section){
+['dashboard','library','upload','mybooks','settings'].forEach(s=>document.getElementById(s+'Section').classList.add('hidden'));
+document.getElementById(section+'Section').classList.remove('hidden');
+if(section==='mybooks')loadMyBooks();
+if(section==='library')loadBooks();}
+
+function showSettingsTab(tab){
+document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+event.target.classList.add('active');
+document.getElementById('profileTab').classList.toggle('hidden',tab!=='profile');
+document.getElementById('securityTab').classList.toggle('hidden',tab!=='security');}
+
+// Dashboard
+async function loadDashboard(){
+const booksSnap=await db.collection('books').get(),usersSnap=await db.collection('users').get();
+let likes=0,downloads=0;
+booksSnap.forEach(d=>{const data=d.data();likes+=(data.likes||[]).length;downloads+=data.downloads||0});
+document.getElementById('totalBooks').textContent=booksSnap.size;
+document.getElementById('totalLikes').textContent=likes;
+document.getElementById('totalDownloads').textContent=downloads;
+document.getElementById('totalUsers').textContent=usersSnap.size;}
+
+// Books
+async function loadBooks(){
+const grid=document.getElementById('booksGrid'),filter=document.getElementById('categoriesFilter');
+grid.innerHTML='<div class="loading"><div class="spinner"></div></div>';
+const snap=await db.collection('books').orderBy('createdAt','desc').get();
+allBooks=[];const cats=new Set(['All']);
+snap.forEach(d=>{allBooks.push({id:d.id,...d.data()});cats.add(d.data().category)});
+filter.innerHTML=[...cats].map(c=>`<button class="category-btn ${c==='All'?'active':''}" onclick="filterBooks('${c}')">${c}</button>`).join('');
+renderBooks(allBooks);}
+
+function renderBooks(books){
+const grid=document.getElementById('booksGrid');
+if(!books.length){grid.innerHTML='<div class="empty-state"><i class="fas fa-book-open"></i><h3>No books found</h3><p>Try a different search or category</p></div>';return}
+grid.innerHTML=books.map(b=>`
+<div class="book-card">
+<img src="${b.imageUrl||''}" class="book-image" onerror="this.style.background='linear-gradient(135deg,var(--primary),var(--secondary))'">
+<div class="book-content">
+<h3 class="book-title">${b.title}</h3>
+<div class="book-meta"><span class="book-tag">${b.category}</span><span class="book-tag">${b.class}</span></div>
+<p class="book-desc">${b.description}</p>
+<div class="book-stats"><span><i class="fas fa-heart"></i>${(b.likes||[]).length}</span><span><i class="fas fa-download"></i>${b.downloads||0}</span><span><i class="fas fa-comment"></i>${(b.comments||[]).length}</span></div>
+<div class="book-actions"><button class="btn btn-primary" onclick="viewBook('${b.id}')"><i class="fas fa-eye"></i>View</button></div>
+</div></div>`).join('');}
+
+function searchBooks(){
+const q=document.getElementById('searchInput').value.toLowerCase();
+const filtered=allBooks.filter(b=>b.title.toLowerCase().includes(q)||b.description.toLowerCase().includes(q)||b.category.toLowerCase().includes(q));
+renderBooks(filtered);}
+
+function filterBooks(cat){
+document.querySelectorAll('.category-btn').forEach(b=>b.classList.remove('active'));
+event.target.classList.add('active');
+renderBooks(cat==='All'?allBooks:allBooks.filter(b=>b.category===cat));}
+
+// My Books
+async function loadMyBooks(){
+const grid=document.getElementById('myBooksGrid');
+grid.innerHTML='<div class="loading"><div class="spinner"></div></div>';
+const snap=await db.collection('books').where('userId','==',currentUser.uid).get();
+const books=[];snap.forEach(d=>books.push({id:d.id,...d.data()}));
+if(!books.length){grid.innerHTML='<div class="empty-state"><i class="fas fa-book"></i><h3>No books uploaded yet</h3><p>Start sharing your books!</p></div>';return}
+grid.innerHTML=books.map(b=>`
+<div class="book-card">
+<img src="${b.imageUrl||''}" class="book-image" onerror="this.style.background='linear-gradient(135deg,var(--primary),var(--secondary))'">
+<div class="book-content">
+<h3 class="book-title">${b.title}</h3>
+<div class="book-meta"><span class="book-tag">${b.category}</span><span class="book-tag">${b.class}</span></div>
+<div class="book-stats"><span><i class="fas fa-heart"></i>${(b.likes||[]).length}</span><span><i class="fas fa-download"></i>${b.downloads||0}</span></div>
+<div class="book-actions">
+<button class="btn btn-primary" onclick="editBook('${b.id}')"><i class="fas fa-edit"></i></button>
+<button class="btn btn-danger" onclick="deleteBook('${b.id}')"><i class="fas fa-trash"></i></button>
+</div></div></div>`).join('');}
+
+// Upload
+function updateFileName(input,labelId){document.getElementById(labelId).textContent=input.files[0]?.name||'Click to upload'}
+
+async function uploadBook(){
+const title=document.getElementById('bookTitle').value,bookClass=document.getElementById('bookClass').value,
+category=document.getElementById('bookCategory').value,description=document.getElementById('bookDesc').value,
+imageFile=document.getElementById('bookImage').files[0],bookFile=document.getElementById('bookFile').files[0];
+if(!title||!category||!description)return toast('Please fill required fields','error');
+try{
+toast('Uploading...','info');
+let imageUrl='',fileUrl='';
+if(imageFile){const ref=storage.ref(`images/${Date.now()}_${imageFile.name}`);await ref.put(imageFile);imageUrl=await ref.getDownloadURL()}
+if(bookFile){const ref=storage.ref(`books/${Date.now()}_${bookFile.name}`);await ref.put(bookFile);fileUrl=await ref.getDownloadURL()}
+await db.collection('books').add({title,class:bookClass,category,description,imageUrl,fileUrl,userId:currentUser.uid,userName:(await db.collection('users').doc(currentUser.uid).get()).data().name,likes:[],comments:[],downloads:0,createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+await db.collection('users').doc(currentUser.uid).update({uploads:firebase.firestore.FieldValue.increment(1)});
+toast('Book uploaded successfully!','success');
+['bookTitle','bookClass','bookCategory','bookDesc'].forEach(id=>document.getElementById(id).value='');
+document.getElementById('bookImage').value='';document.getElementById('bookFile').value='';
+document.getElementById('imageFileName').textContent='Click to upload image';
+document.getElementById('bookFileName').textContent='Click to upload PDF';
+loadDashboard();}catch(e){toast(e.message,'error')}}
+
+// View Book
+async function viewBook(id){
+const doc=await db.collection('books').doc(id).get();
+if(!doc.exists)return;
+currentBook={id,...doc.data()};
+document.getElementById('modalBookTitle').textContent=currentBook.title;
+document.getElementById('modalBookImage').src=currentBook.imageUrl||'';
+document.getElementById('modalBookMeta').innerHTML=`<span class="book-tag">${currentBook.category}</span><span class="book-tag">${currentBook.class}</span><span class="book-tag">By: ${currentBook.userName}</span>`;
+document.getElementById('modalBookDesc').textContent=currentBook.description;
+document.getElementById('likeCount').textContent=(currentBook.likes||[]).length;
+document.getElementById('likeBtn').innerHTML=`<i class="fas fa-heart" style="color:${(currentBook.likes||[]).includes(currentUser.uid)?'#ef4444':'inherit'}"></i><span id="likeCount">${(currentBook.likes||[]).length}</span>`;
+renderComments();
+document.getElementById('bookModal').classList.remove('hidden');}
+
+function closeModal(){document.getElementById('bookModal').classList.add('hidden')}
+
+async function toggleLike(){
+if(!currentBook)return;
+const likes=currentBook.likes||[],idx=likes.indexOf(currentUser.uid);
+idx>-1?likes.splice(idx,1):likes.push(currentUser.uid);
+await db.collection('books').doc(currentBook.id).update({likes});
+currentBook.likes=likes;
+document.getElementById('likeBtn').innerHTML=`<i class="fas fa-heart" style="color:${likes.includes(currentUser.uid)?'#ef4444':'inherit'}"></i><span id="likeCount">${likes.length}</span>`;
+loadDashboard();}
+
+async function downloadBook(){
+if(!currentBook||!currentBook.fileUrl)return toast('No file available','error');
+const userDoc=await db.collection('users').doc(currentUser.uid).get();
+if(userDoc.data().canDownload===false)return toast('You are restricted from downloading','error');
+await db.collection('books').doc(currentBook.id).update({downloads:firebase.firestore.FieldValue.increment(1)});
+window.open(currentBook.fileUrl,'_blank');
+toast('Download started!','success');loadDashboard();}
+
+function renderComments(){
+const section=document.getElementById('commentsSection');
+const comments=currentBook.comments||[];
+section.innerHTML=comments.length?comments.map(c=>`<div class="comment"><div class="comment-header"><span class="comment-user">${c.userName}</span><span class="comment-date">${new Date(c.createdAt?.toDate?.())||new Date()}</span></div><p class="comment-text">${c.text}</p></div>`).join(''):'<p style="color:rgba(255,255,255,0.5);text-align:center">No comments yet</p>';}
+
+async function addComment(){
+const text=document.getElementById('commentInput').value.trim();
+if(!text||!currentBook)return;
+const userDoc=await db.collection('users').doc(currentUser.uid).get();
+const comment={text,userName:userDoc.data().name,userId:currentUser.uid,createdAt:new Date()};
+await db.collection('books').doc(currentBook.id).update({comments:firebase.firestore.FieldValue.arrayUnion(comment)});
+currentBook.comments=[...(currentBook.comments||[]),comment];
+document.getElementById('commentInput').value='';
+renderComments();toast('Comment added!','success');}
+
+// Edit/Delete Book
+async function editBook(id){
+const doc=await db.collection('books').doc(id).get();
+if(!doc.exists)return;
+const data=doc.data();editingBookId=id;
+document.getElementById('editBookTitle').value=data.title;
+document.getElementById('editBookClass').value=data.class;
+document.getElementById('editBookCategory').value=data.category;
+document.getElementById('editBookDesc').value=data.description;
+document.getElementById('editBookModal').classList.remove('hidden');}
+
+function closeEditModal(){document.getElementById('editBookModal').classList.add('hidden');editingBookId=null}
+
+async function saveBookEdit(){
+if(!editingBookId)return;
+await db.collection('books').doc(editingBookId).update({
+title:document.getElementById('editBookTitle').value,
+class:document.getElementById('editBookClass').value,
+category:document.getElementById('editBookCategory').value,
+description:document.getElementById('editBookDesc').value});
+closeEditModal();loadMyBooks();toast('Book updated!','success');}
+
+async function deleteBook(id){
+if(!confirm('Are you sure you want to delete this book?'))return;
+await db.collection('books').doc(id).delete();
+await db.collection('users').doc(currentUser.uid).update({uploads:firebase.firestore.FieldValue.increment(-1)});
+loadMyBooks();loadDashboard();toast('Book deleted!','success');}
+
+// Settings
+async function updateProfile(){
+const name=document.getElementById('settingsName').value,email=document.getElementById('settingsEmail').value;
+if(!name||!email)return toast('Please fill all fields','error');
+try{
+await db.collection('users').doc(currentUser.uid).update({name,email});
+if(email!==currentUser.email)await currentUser.updateEmail(email);
+document.getElementById('userName').textContent=name;
+document.getElementById('userAvatar').textContent=name.charAt(0).toUpperCase();
+toast('Profile updated!','success');}catch(e){toast(e.message,'error')}}
+
+async function updatePassword(){
+const current=document.getElementById('currentPassword').value,newPass=document.getElementById('newPassword').value,confirm=document.getElementById('confirmPassword').value;
+if(!current||!newPass||!confirm)return toast('Please fill all fields','error');
+if(newPass!==confirm)return toast('Passwords do not match','error');
+try{
+const cred=firebase.auth.EmailAuthProvider.credential(currentUser.email,current);
+await currentUser.reauthenticateWithCredential(cred);
+await currentUser.updatePassword(newPass);
+['currentPassword','newPassword','confirmPassword'].forEach(id=>document.getElementById(id).value='');
+toast('Password updated!','success');}catch(e){toast(e.message,'error')}}
+
+// Admin Functions
+async function loadAdminData(){loadAdminUsers();loadAdminBooks()}
+
+function showAdminSection(section){
+document.getElementById('adminUsersSection').classList.toggle('hidden',section!=='users');
+document.getElementById('adminBooksSection').classList.toggle('hidden',section!=='books');}
+
+async function loadAdminUsers(){
+const snap=await db.collection('users').get();
+allUsers=[];snap.forEach(d=>allUsers.push({id:d.id,...d.data()}));
+const body=document.getElementById('usersTableBody');
+body.innerHTML=allUsers.map(u=>`<tr>
+<td>${u.name}</td><td>${u.email}</td>
+<td><span class="status-badge ${u.status==='restricted'?'status-restricted':'status-active'}">${u.status||'active'}</span></td>
+<td>${u.uploads||0}</td>
+<td>
+<button class="btn btn-${u.status==='restricted'?'success':'warning'}" onclick="toggleUserStatus('${u.id}','${u.status}')" style="padding:6px 12px;font-size:0.8rem">
+${u.status==='restricted'?'Unrestrict':'Restrict'}</button>
+<button class="btn btn-danger" onclick="deleteUser('${u.id}')" style="padding:6px 12px;font-size:0.8rem">Delete</button>
+</td></tr>`).join('');}
+
+async function toggleUserStatus(id,currentStatus){
+const newStatus=currentStatus==='restricted'?'active':'restricted';
+const canDownload=newStatus!=='restricted';
+await db.collection('users').doc(id).update({status:newStatus,canDownload});
+loadAdminUsers();toast(`User ${newStatus}!`,'success');}
+
+async function deleteUser(id){
+if(!confirm('Delete this user and all their books?'))return;
+const booksSnap=await db.collection('books').where('userId','==',id).get();
+const batch=db.batch();booksSnap.forEach(d=>batch.delete(d.ref));
+batch.delete(db.collection('users').doc(id));await batch.commit();
+loadAdminUsers();loadAdminBooks();toast('User deleted!','success');}
+
+async function loadAdminBooks(){
+const snap=await db.collection('books').orderBy('createdAt','desc').get();
+allBooks=[];snap.forEach(d=>allBooks.push({id:d.id,...d.data()}));
+renderAdminBooks(allBooks);}
+
+function renderAdminBooks(books){
+const grid=document.getElementById('adminBooksGrid');
+grid.innerHTML=books.map(b=>`
+<div class="book-card">
+<img src="${b.imageUrl||''}" class="book-image" onerror="this.style.background='linear-gradient(135deg,var(--primary),var(--secondary))'">
+<div class="book-content">
+<h3 class="book-title">${b.title}</h3>
+<div class="book-meta"><span class="book-tag">${b.category}</span><span class="book-tag">By: ${b.userName}</span></div>
+<div class="book-actions"><button class="btn btn-danger" onclick="adminDeleteBook('${b.id}')"><i class="fas fa-trash"></i>Delete</button></div>
+</div></div>`).join('');}
+
+function searchAdminBooks(){
+const q=document.getElementById('adminSearchBooks').value.toLowerCase();
+renderAdminBooks(allBooks.filter(b=>b.title.toLowerCase().includes(q)||b.userName?.toLowerCase().includes(q)));}
+
+async function adminDeleteBook(id){
+if(!confirm('Delete this book?'))return;
+await db.collection('books').doc(id).delete();
+loadAdminBooks();toast('Book deleted!','success');}
+
+// Close modals on outside click
+document.querySelectorAll('.modal').forEach(m=>m.addEventListener('click',e=>{if(e.target===m){m.classList.add('hidden');editingBookId=null}}));
+</script>
+</body>
+</html>
